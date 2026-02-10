@@ -1,0 +1,10 @@
+const green_body = [145 / 255, 172 / 255, 18 / 255, 1.0];
+const brown_legs = [104 / 255, 53 / 255, 11 / 255, 1.0];
+const shell_yellow = [234 / 255, 172 / 255, 50 / 255, 1.0];
+const black_eyeball = [0 / 255, 0 / 255, 0 / 255, 1.0];
+const white_eyeball = [255 / 255, 255 / 255, 255 / 255, 1.0];
+const mouth_color = [255 / 255, 0 / 255, 0 / 255, 1.0];
+const tongue_color = [203 / 255, 0 / 255, 118 / 255, 1.0];
+const flipper_tip = [135 / 255, 70 / 255, 20 / 255, 1.0];
+const flipper_lower = [115 / 255, 60 / 255, 15 / 255, 1.0];
+const flipper_upper = [95 / 255, 50 / 255, 10 / 255, 1.0];

@@ -1,0 +1,252 @@
+<!--
+Marc Verges Santiago
+mvergess@ucsc.edu
+
+Notes to Grader:
+Nothing.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Assignment 2 - Blocky Turtle</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #e1f4f3;
+            --accent-color: #bbe1fa;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3rem;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            color: var(--accent-color);
+            letter-spacing: 2px;
+        }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        #canvas-container {
+            position: relative;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+
+        .controls-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            width: 320px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        input[type=checkbox] {
+            transform: scale(1.5);
+            cursor: pointer;
+        }
+
+        .axis-legend {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 8px;
+            justify-content: center;
+        }
+
+        .axis-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body onload="main()">
+    <h1>🐢 My Turtle: CSE-160 Assignment 2</h1>
+
+    <div class="main-container">
+        <div id="canvas-container">
+            <canvas id="webgl" width="400" height="400">
+                Please use a browser supporting "canvas"
+            </canvas>
+            <div id="fps"></div>
+            <div class="axis-legend">
+                <div class="axis-item"><span class="dot" style="background:red;"></span> X</div>
+                <div class="axis-item"><span class="dot" style="background:green;"></span> Y</div>
+                <div class="axis-item"><span class="dot" style="background:blue;"></span> Z</div>
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <div class="control-group">
+                <label for="angleSlide">Camera Angle</label>
+                <input type="range" min="0" max="360" value="190" class="slider" id="angleSlide" />
+            </div>
+
+            <div class="control-group">
+                <label for="firstFlipperAngle">First Flipper Angle</label>
+                <input type="range" min="-45" max="45" value="0" class="slider" id="firstFlipperAngle" />
+                <div class="toggle-container" style="margin-top: 5px;">
+                    <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Activate Animation of First
+                        Flipper</label>
+                    <input type="checkbox" id="my-toggle-firstFlipper">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="middleFlipperAngle">Middle Flipper Angle</label>
+                <input type="range" min="-45" max="45" value="0" class="slider" id="middleFlipperAngle" />
+                <div class="toggle-container" style="margin-top: 5px;">
+                    <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Activate Animation of Middle
+                        Flipper</label>
+                    <input type="checkbox" id="my-toggle-middleFlipper">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="secondFlipperAngle">Back Flipper Angle</label>
+                <input type="range" min="-45" max="45" value="0" class="slider" id="secondFlipperAngle" />
+                <div class="toggle-container" style="margin-top: 5px;">
+                    <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Activate Animation of Back
+                        Flipper</label>
+                    <input type="checkbox" id="my-toggle-secondFlipper">
+                </div>
+            </div>
+
+
+            <div class="toggle-container">
+                <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Show Axis</label>
+                <input type="checkbox" id="my-toggle" checked>
+            </div>
+            <div class="toggle-container">
+                <label for="my-toggle-movement" style="cursor:pointer; flex-grow: 1;">
+                    Movement Animation
+                    <span style="margin-left: 5px; cursor: help; color: #FFFFFF;"
+                        title="Every joint is being moved: shell scaled, head rotation, legs moving, and tail too">ⓘ</span>
+                </label>
+                <input type="checkbox" id="my-toggle-movement">
+            </div>
+
+
+        </div>
+    </div>
+
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+    <script src="../lib/stats.js"></script>
+    <script src="../world/World.js"></script>
+    <script src="../blockyAnimal2/Point.js"></script>
+    <script src="../blockyAnimal2/Triangle.js"></script>
+    <script src="../blockyAnimal2/Circle.js"></script>
+    <script src="../blockyAnimal2/Cube.js"></script>
+    <script src="../blockyAnimal2/Sphere.js"></script>
+    <script src="../blockyAnimal2/Colors.js"></script>
+</body>
+
+</html>
