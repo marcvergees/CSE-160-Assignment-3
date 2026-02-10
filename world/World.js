@@ -1,24 +1,37 @@
-var VSHADER_SOURCE =
-    'attribute vec4 a_Position;\n' +
-    'uniform mat4 u_ModelMatrix;\n' +
-    'uniform mat4 u_GlobalRotateMatrix;\n' +
-    'void main() {\n' +
-    ' gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;\n' +
-    '}\n';
+var VSHADER_SOURCE = `
+    precision mediump float;
+    attribute vec4 a_Position;
+    attribute vec2 a_UV;
+    varying vec2 v_UV;
+    uniform mat4 u_ModelMatrix;
+    uniform mat4 u_GlobalRotateMatrix;
+    uniform mat4 u_ViewMatrix;
+    uniform mat4 u_ProjectionMatrix;
+    void main() {
+        gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
+        // v_UV = a_UV;
+    }
+`;
 
-var FSHADER_SOURCE =
-    'precision mediump float;\n' +
-    'uniform vec4 u_FragColor;\n' +
-    'void main() {\n' +
-    ' gl_FragColor = u_FragColor;\n' +
-    '}\n';
+var FSHADER_SOURCE = `
+    precision mediump float;
+    varying vec2 v_UV;
+    uniform vec4 u_FragColor;
+    void main() {
+        gl_FragColor = u_FragColor;
+        // gl_FragColor = vec4(v_UV, 1.0, 1.0);
+    }`;
 
 
 let canvas;
 let gl;
 let a_Position;
+let a_UV;
 let u_FragColor;
+let u_Size;
 let u_ModelMatrix;
+let u_ViewMatrix;
+let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
 
 let g_showAxis = true;
