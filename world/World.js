@@ -20,6 +20,9 @@ var FSHADER_SOURCE = `
     uniform sampler2D u_Sampler0;
     uniform sampler2D u_Sampler1;
     uniform sampler2D u_Sampler2;
+    uniform sampler2D u_Sampler3;
+    uniform sampler2D u_Sampler4;
+    uniform sampler2D u_Sampler5;
     uniform int u_whichTexture;
     void main() {
         if (u_whichTexture == -2) {
@@ -32,6 +35,12 @@ var FSHADER_SOURCE = `
             gl_FragColor = texture2D(u_Sampler1, v_UV);     // Texture 1
         } else if (u_whichTexture == 2) {
             gl_FragColor = texture2D(u_Sampler2, v_UV);     // Texture 2
+        } else if (u_whichTexture == 3) {
+            gl_FragColor = texture2D(u_Sampler3, v_UV);     // Texture 3
+        } else if (u_whichTexture == 4) {
+            gl_FragColor = texture2D(u_Sampler4, v_UV);     // Texture 4
+        } else if (u_whichTexture == 5) {
+            gl_FragColor = texture2D(u_Sampler5, v_UV);     // Texture 5
         } else {
             gl_FragColor = vec4(1, .2, .2, 1);              // Default color
         }
@@ -51,6 +60,9 @@ let u_GlobalRotateMatrix;
 let u_Sampler0;
 let u_Sampler1;
 let u_Sampler2;
+let u_Sampler3;
+let u_Sampler4;
+let u_Sampler5;
 let u_whichTexture;
 
 let g_showAxis = true;
@@ -88,20 +100,20 @@ var g_map = [
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 1, 6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 8, 8, 0, 0, 0, 0, 8, 8, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 8, 9, 0, 0, 0, 0, 9, 8, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 3, 2, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 8, 9, 0, 0, 0, 0, 9, 8, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 8, 8, 0, 0, 0, 0, 8, 8, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1, 6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 8.4, 8.4, 0, 0, 0, 0, 8.4, 8.4, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 0, 0, 8.4, 9.4, 0, 0, 0, 0, 9.4, 8.4, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 0, 0, 0, 0, 0, 0, 1.5, 2.5, 2.5, 1.5, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 2, 4.3, 0, 0, 0, 0, 0, 0, 1.5, 2.5, 2.5, 1.5, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 0, 0, 8.4, 9.4, 0, 0, 0, 0, 9.4, 8.4, 0, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 8.4, 8.4, 0, 0, 0, 0, 8.4, 8.4, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
@@ -115,10 +127,20 @@ var g_map = [
 function drawMap() {
     for (let x = 0; x < g_map.length; x++) {
         for (let y = 0; y < g_map[x].length; y++) {
-            for (let height = 0; height < g_map[x][y]; height++) {
+            let height_to_get = parseInt(g_map[x][y]);
+            for (let height = 0; height < height_to_get; height++) {
                 var cube = new Cube();
                 // cube.color = [.5, .5, .5, 1];
-                cube.textureNum = 2;
+                var decimal = Math.round((g_map[x][y] - height_to_get) * 10) / 10;
+                if (decimal == .3) {
+                    cube.textureNum = 3;
+                } else if (decimal == .4) {
+                    cube.textureNum = 4;
+                } else if (decimal == .5) {
+                    cube.textureNum = 5;
+                } else {
+                    cube.textureNum = 2;
+                }
                 cube.matrix.translate(0, -.75 + height, 0);
                 cube.matrix.translate(x - 16, 0, y - 16);
                 cube.renderfast();
@@ -220,6 +242,21 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of u_Sampler2');
         return;
     }
+    u_Sampler3 = gl.getUniformLocation(gl.program, 'u_Sampler3');
+    if (u_Sampler3 < 0) {
+        console.log('Failed to get the storage location of u_Sampler3');
+        return;
+    }
+    u_Sampler4 = gl.getUniformLocation(gl.program, 'u_Sampler4');
+    if (u_Sampler4 < 0) {
+        console.log('Failed to get the storage location of u_Sampler4');
+        return;
+    }
+    u_Sampler5 = gl.getUniformLocation(gl.program, 'u_Sampler5');
+    if (u_Sampler5 < 0) {
+        console.log('Failed to get the storage location of u_Sampler5');
+        return;
+    }
     u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture');
     if (!u_whichTexture) {
         console.log('Failed to get the storage location of u_whichTexture');
@@ -292,6 +329,30 @@ function initTextures() {
     image2.onload = function () { sendImageToTEXTURE2(image2); };
     image2.src = '../img/stone.png';
 
+    var image3 = new Image();
+    if (!image3) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image3.onload = function () { sendImageToTEXTURE3(image3); };
+    image3.src = '../img/wood.jpeg';
+
+    var image4 = new Image();
+    if (!image4) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image4.onload = function () { sendImageToTEXTURE4(image4); };
+    image4.src = '../img/tree.png';
+
+    var image5 = new Image();
+    if (!image5) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image5.onload = function () { sendImageToTEXTURE5(image5); };
+    image5.src = '../img/diamond.png';
+
     // Add more texture loading here if we need to
     return true;
 }
@@ -308,9 +369,6 @@ function sendImageToTEXTURE0(image) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(u_Sampler0, 0);
-
-    // gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
 }
 
 function sendImageToTEXTURE1(image) {
@@ -325,9 +383,6 @@ function sendImageToTEXTURE1(image) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(u_Sampler1, 1);
-
-    // gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
 }
 function sendImageToTEXTURE2(image) {
     var texture = gl.createTexture();
@@ -341,9 +396,48 @@ function sendImageToTEXTURE2(image) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(u_Sampler2, 2);
+}
 
-    // gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
+function sendImageToTEXTURE3(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler3, 3);
+}
+
+function sendImageToTEXTURE4(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE4);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler4, 4);
+}
+
+function sendImageToTEXTURE5(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE5);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler5, 5);
 }
 
 function initCamera() {
