@@ -18,6 +18,7 @@ var FSHADER_SOURCE = `
     varying vec2 v_UV;
     uniform vec4 u_FragColor;
     uniform sampler2D u_Sampler0;
+    uniform sampler2D u_Sampler1;
     uniform int u_whichTexture;
     void main() {
         if (u_whichTexture == -2) {
@@ -26,6 +27,8 @@ var FSHADER_SOURCE = `
             gl_FragColor = vec4(v_UV, 1.0, 1.0);            // UV coordinates
         } else if (u_whichTexture == 0) {
             gl_FragColor = texture2D(u_Sampler0, v_UV);     // Texture 0
+        } else if (u_whichTexture == 1) {
+            gl_FragColor = texture2D(u_Sampler1, v_UV);     // Texture 1
         } else {
             gl_FragColor = vec4(1, .2, .2, 1);              // Default color
         }
@@ -43,6 +46,7 @@ let u_ViewMatrix;
 let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
 let u_Sampler0;
+let u_Sampler1;
 let u_whichTexture;
 
 let g_showAxis = true;
@@ -142,6 +146,11 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of u_Sampler0');
         return;
     }
+    u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1');
+    if (u_Sampler1 < 0) {
+        console.log('Failed to get the storage location of u_Sampler1');
+        return;
+    }
     u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture');
     if (!u_whichTexture) {
         console.log('Failed to get the storage location of u_whichTexture');
@@ -190,13 +199,21 @@ function addActionsForHTMLUI() {
 }
 
 function initTextures() {
-    var image = new Image();
-    if (!image) {
+    var image1 = new Image();
+    if (!image1) {
         console.log('Failed to load the image');
         return false;
     }
-    image.onload = function () { sendImageToTEXTURE0(image); };
-    image.src = '../img/sky.jpg';
+    image1.onload = function () { sendImageToTEXTURE0(image1); };
+    image1.src = '../img/floor.jpg';
+
+    var image2 = new Image();
+    if (!image2) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image2.onload = function () { sendImageToTEXTURE1(image2); };
+    image2.src = '../img/sky.jpg';
 
     // Add more texture loading here if we need to
     return true;
@@ -219,12 +236,28 @@ function sendImageToTEXTURE0(image) {
     // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
 }
 
+function sendImageToTEXTURE1(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler1, 1);
+
+    // gl.clear(gl.COLOR_BUFFER_BIT);
+    // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
+}
+
 function initCamera() {
     g_camera = new Camera();
     g_camera.eye = new Vector3([0, 0, 3]);
     g_camera.at = new Vector3([0, 0, -100]);
     g_camera.up = new Vector3([0, 1, 0]);
-    console.log(g_camera.toString());
 }
 
 function main() {
@@ -525,19 +558,36 @@ function renderScene() {
     }
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    var startTime = performance.now();
 
     var projMat = new Matrix4();
     projMat.setPerspective(60, canvas.width / canvas.height, 0.1, 100);
     gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
 
     var viewMat = new Matrix4();
+    // console.log(g_camera.toString());
     viewMat.lookAt(g_camera.eye.elements[0], g_camera.eye.elements[1], g_camera.eye.elements[2], g_camera.at.elements[0], g_camera.at.elements[1], g_camera.at.elements[2], g_camera.up.elements[0], g_camera.up.elements[1], g_camera.up.elements[2]); // (eye, at, up)
+    // console.log(g_camera.toString());
     gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
 
     var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
     gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     // drawTurtle(sceneMatrix);
+
+    var startTime = performance.now();
+
+    var floor = new Cube();
+    floor.color = [1, 0, 0, 1];
+    floor.textureNum = 0;
+    floor.matrix.translate(0, -.75, 0);
+    floor.matrix.scale(10, 0, 10);
+    floor.matrix.translate(-.5, 0, -.5);
+    floor.render();
+
+    var sky = new Cube();
+    sky.textureNum = 1;
+    sky.matrix.scale(50, 50, 50);
+    sky.matrix.translate(-.5, -.5, -.5);
+    sky.render();
 
     var cube = new Cube();
     cube.color = green_body;
