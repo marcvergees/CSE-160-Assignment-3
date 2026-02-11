@@ -17,9 +17,11 @@ var FSHADER_SOURCE = `
     precision mediump float;
     varying vec2 v_UV;
     uniform vec4 u_FragColor;
+    uniform sampler2D u_Sampler0;
     void main() {
         gl_FragColor = u_FragColor;
         gl_FragColor = vec4(v_UV, 1.0, 1.0);
+        gl_FragColor = texture2D(u_Sampler0, v_UV);
     }`;
 
 
@@ -33,6 +35,7 @@ let u_ModelMatrix;
 let u_ViewMatrix;
 let u_ProjectionMatrix;
 let u_GlobalRotateMatrix;
+let u_Sampler0;
 
 let g_showAxis = true;
 let g_globalAngle = 0;
@@ -123,6 +126,11 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of u_GlobalRotateMatrix');
         return;
     }
+    u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
+    if (u_Sampler0 < 0) {
+        console.log('Failed to get the storage location of u_Sampler0');
+        return;
+    }
 
     var identityM = new Matrix4();
     gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
@@ -140,6 +148,8 @@ function connectVariablesToGLSL() {
         return;
     }
     gl.uniformMatrix4fv(u_ProjectionMatrix, false, identityM.elements);
+
+
 }
 
 function addActionsForHTMLUI() {
@@ -168,11 +178,44 @@ function addActionsForHTMLUI() {
     });
 }
 
+function initTextures() {
+    var image = new Image();
+    if (!image) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image.onload = function () { sendImageToTEXTURE0(image); };
+    image.src = '../img/sky.jpg';
+
+    // Add more texture loading here if we need to
+    return true;
+}
+
+function sendImageToTEXTURE0(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler0, 0);
+
+    // gl.clear(gl.COLOR_BUFFER_BIT);
+    // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
+    console.log("Finished loading texture");
+}
+
+
 function main() {
     createStats();
     setUpWebGL();
     connectVariablesToGLSL();
     addActionsForHTMLUI();
+    initTextures();
     canvas.onmousedown = click;
     canvas.onmousemove = function (ev) { if (ev.buttons == 1) click(ev); }; // if we remove ev.buttons == 1, we can drag the mouse without clicking. But we want click+drag to work.
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
