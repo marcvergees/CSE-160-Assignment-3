@@ -68,6 +68,10 @@ let stats;
 var g_startTime = performance.now() / 1000.0;
 var g_seconds = performance.now() / 1000.0 - g_startTime;
 
+var g_eye = new Vector3([0, 0, 3]);
+var g_at = new Vector3([0, 0, -100]);
+var g_up = new Vector3([0, 1, 0]);
+
 
 function createStats() {
     stats = new Stats();
@@ -214,7 +218,6 @@ function sendImageToTEXTURE0(image) {
 
     // gl.clear(gl.COLOR_BUFFER_BIT);
     // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
-    console.log("Finished loading texture");
 }
 
 
@@ -483,8 +486,6 @@ function drawTurtle(matrix) {
 }
 
 function renderScene() {
-    var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
-
     if (g_pokeAnimation) {
         let timeElapsed = g_seconds - g_pokeStartTime;
         if (timeElapsed > 1.0) {
@@ -502,12 +503,14 @@ function renderScene() {
     var startTime = performance.now();
 
     var projMat = new Matrix4();
+    projMat.setPerspective(60, canvas.width / canvas.height, 0.1, 100);
     gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
 
     var viewMat = new Matrix4();
+    viewMat.lookAt(g_eye.elements[0], g_eye.elements[1], g_eye.elements[2], g_at.elements[0], g_at.elements[1], g_at.elements[2], g_up.elements[0], g_up.elements[1], g_up.elements[2]); // (eye, at, up)
     gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
 
-    var globalRotMat = new Matrix4();
+    var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
     gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     // drawTurtle(sceneMatrix);
 
