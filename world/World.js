@@ -144,25 +144,20 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of u_whichTexture');
         return;
     }
-
-    var identityM = new Matrix4();
-    gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
-
     u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
     if (u_ViewMatrix < 0) {
         console.log('Failed to get the storage location of u_ViewMatrix');
         return;
     }
-    gl.uniformMatrix4fv(u_ViewMatrix, false, identityM.elements);
 
     u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
     if (u_ProjectionMatrix < 0) {
         console.log('Failed to get the storage location of u_ProjectionMatrix');
         return;
     }
-    gl.uniformMatrix4fv(u_ProjectionMatrix, false, identityM.elements);
 
-
+    var identityM = new Matrix4();
+    gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
 }
 
 function addActionsForHTMLUI() {
@@ -503,9 +498,17 @@ function renderScene() {
         }
     }
 
-    gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     var startTime = performance.now();
+
+    var projMat = new Matrix4();
+    gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
+
+    var viewMat = new Matrix4();
+    gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
+
+    var globalRotMat = new Matrix4();
+    gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     // drawTurtle(sceneMatrix);
 
     var cube = new Cube();
