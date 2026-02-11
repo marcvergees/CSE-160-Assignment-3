@@ -9,7 +9,7 @@ var VSHADER_SOURCE = `
     uniform mat4 u_ProjectionMatrix;
     void main() {
         gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
-        // v_UV = a_UV;
+        v_UV = a_UV;
     }
 `;
 
@@ -19,7 +19,7 @@ var FSHADER_SOURCE = `
     uniform vec4 u_FragColor;
     void main() {
         gl_FragColor = u_FragColor;
-        // gl_FragColor = vec4(v_UV, 1.0, 1.0);
+        gl_FragColor = vec4(v_UV, 1.0, 1.0);
     }`;
 
 
@@ -103,6 +103,11 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of a_Position');
         return;
     }
+    a_UV = gl.getAttribLocation(gl.program, 'a_UV');
+    if (a_UV < 0) {
+        console.log('Failed to get the storage location of a_UV');
+        return;
+    }
     u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
     if (u_FragColor < 0) {
         console.log('Failed to get the storage location of u_FragColor');
@@ -121,6 +126,20 @@ function connectVariablesToGLSL() {
 
     var identityM = new Matrix4();
     gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
+
+    u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+    if (u_ViewMatrix < 0) {
+        console.log('Failed to get the storage location of u_ViewMatrix');
+        return;
+    }
+    gl.uniformMatrix4fv(u_ViewMatrix, false, identityM.elements);
+
+    u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
+    if (u_ProjectionMatrix < 0) {
+        console.log('Failed to get the storage location of u_ProjectionMatrix');
+        return;
+    }
+    gl.uniformMatrix4fv(u_ProjectionMatrix, false, identityM.elements);
 }
 
 function addActionsForHTMLUI() {
@@ -431,7 +450,14 @@ function renderScene() {
     gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     var startTime = performance.now();
-    drawTurtle(sceneMatrix);
+    // drawTurtle(sceneMatrix);
+
+    var cube = new Cube();
+    cube.color = green_body;
+    cube.matrix = new Matrix4(sceneMatrix);
+    cube.matrix.scale(.5, .5, .5);
+    cube.render();
+
     var endTime = performance.now();
     sendTextToHTML("ms: " + Math.floor(endTime - startTime) + " fps: " + Math.floor(1000 / (endTime - startTime)), "fps");
 }
