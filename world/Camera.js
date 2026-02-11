@@ -85,8 +85,47 @@ class Camera {
         this.at.add(f_prime);                                               // at = eye + f_prime
     }
 
+    tiltUp(alpha) {
+        let f = new Vector3();
+        f.set(this.at);
+        f.sub(this.eye);
+
+        let s = Vector3.cross(f, this.up);
+        s.normalize();
+
+        let rotationMatrix = new Matrix4();
+        rotationMatrix.setRotate(alpha, s.elements[0], s.elements[1], s.elements[2]);
+        let f_prime = rotationMatrix.multiplyVector3(f);
+
+        this.at.set(this.eye);
+        this.at.add(f_prime);
+    }
+
+    tiltDown(alpha) {
+        let f = new Vector3();
+        f.set(this.at);
+        f.sub(this.eye);
+
+        let s = Vector3.cross(f, this.up);
+        s.normalize();
+
+        let rotationMatrix = new Matrix4();
+        rotationMatrix.setRotate(-alpha, s.elements[0], s.elements[1], s.elements[2]);
+        let f_prime = rotationMatrix.multiplyVector3(f);
+
+        this.at.set(this.eye);
+        this.at.add(f_prime);
+    }
+
     toString() {
         return `at: ${this.at.elements}, eye: ${this.eye.elements}, up: ${this.up.elements}`;
+    }
+
+    reset() {
+        this.eye.set(new Vector3([0, 0, 0]));
+        this.at.set(new Vector3([0, 0, -1]));
+        this.up.set(new Vector3([0, 1, 0]));
+        this.initialize_view_projection_matrices();
     }
 
 }

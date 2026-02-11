@@ -1,0 +1,3 @@
+Light/Dark Mode -> change sky and floor
+Add Instructions of camera and character movement
+Change design of the page such that gets closer to medieval page
