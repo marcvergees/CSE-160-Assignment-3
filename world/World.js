@@ -62,15 +62,14 @@ let g_animationMovement = false;
 let g_pokeAnimation = false;
 let g_pokeStartTime = 0;
 
+let g_camera;
 let sceneMatrix = new Matrix4();
 let stats;
 
 var g_startTime = performance.now() / 1000.0;
 var g_seconds = performance.now() / 1000.0 - g_startTime;
 
-var g_eye = new Vector3([0, 0, 3]);
-var g_at = new Vector3([0, 0, -100]);
-var g_up = new Vector3([0, 1, 0]);
+
 
 
 function createStats() {
@@ -220,6 +219,13 @@ function sendImageToTEXTURE0(image) {
     // gl.drawArrays(gl.TRIANGLES_STRIP, 0, n);
 }
 
+function initCamera() {
+    g_camera = new Camera();
+    g_camera.eye = new Vector3([0, 0, 3]);
+    g_camera.at = new Vector3([0, 0, -100]);
+    g_camera.up = new Vector3([0, 1, 0]);
+    console.log(g_camera.toString());
+}
 
 function main() {
     createStats();
@@ -227,12 +233,31 @@ function main() {
     connectVariablesToGLSL();
     addActionsForHTMLUI();
     initTextures();
+    initCamera();
     canvas.onmousedown = click;
     canvas.onmousemove = function (ev) { if (ev.buttons == 1) click(ev); }; // if we remove ev.buttons == 1, we can drag the mouse without clicking. But we want click+drag to work.
+    document.onkeydown = keydown;
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // renderScene();
     requestAnimationFrame(tick);
+}
+
+function keydown(ev) {
+    if (ev.keyCode == 87 || ev.keyCode == 38) { // W or up arrow
+        g_camera.moveForward(0.2);
+    } else if (ev.keyCode == 83 || ev.keyCode == 40) { // S or down arrow
+        g_camera.moveBackwards(0.2);
+    } else if (ev.keyCode == 65 || ev.keyCode == 37) { // A or left arrow
+        g_camera.moveLeft(0.2);
+    } else if (ev.keyCode == 68 || ev.keyCode == 39) { // D or right arrow
+        g_camera.moveRight(0.2);
+    } else if (ev.keyCode == 81) { // Q
+        g_camera.panLeft(5);
+    } else if (ev.keyCode == 69) { // E
+        g_camera.panRight(5);
+    }
+    renderScene();
 }
 
 function tick() {
@@ -507,7 +532,7 @@ function renderScene() {
     gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
 
     var viewMat = new Matrix4();
-    viewMat.lookAt(g_eye.elements[0], g_eye.elements[1], g_eye.elements[2], g_at.elements[0], g_at.elements[1], g_at.elements[2], g_up.elements[0], g_up.elements[1], g_up.elements[2]); // (eye, at, up)
+    viewMat.lookAt(g_camera.eye.elements[0], g_camera.eye.elements[1], g_camera.eye.elements[2], g_camera.at.elements[0], g_camera.at.elements[1], g_camera.at.elements[2], g_camera.up.elements[0], g_camera.up.elements[1], g_camera.up.elements[2]); // (eye, at, up)
     gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
 
     var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);

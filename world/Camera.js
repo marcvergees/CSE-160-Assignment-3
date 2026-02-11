@@ -40,8 +40,7 @@ class Camera {
         f.sub(this.eye);        // f = at - eye
 
         let s = new Vector3();
-        s.set(this.up);         // s = up
-        s.cross(f);             // s = up x f
+        s.set(Vector3.cross(this.up, f));         // s = up
         s.normalize();          // s = (up x f) / |up x f|
         s.mul(speed);           // s = speed * (up x f) / |up x f|
         this.eye.add(s);        // eye = eye + s
@@ -54,15 +53,14 @@ class Camera {
         f.sub(this.eye);        // f = at - eye
 
         let s = new Vector3();
-        s.set(f);               // s = f
-        s.cross(this.up);       // s = f x up
+        s.set(Vector3.cross(f, this.up));       // s = f x up
         s.normalize();          // s = (f x up) / |f x up|
         s.mul(speed);           // s = speed * (f x up) / |f x up|
         this.eye.add(s);        // eye = eye + s
         this.at.add(s);         // at = at + s
     }
 
-    panLeft(alpha, speed) {
+    panLeft(alpha) {
         let f = new Vector3();
         f.set(this.at);         // f = at
         f.sub(this.eye);        // f = at - eye
@@ -75,7 +73,7 @@ class Camera {
         this.at.add(f_prime);                                               // at = eye + f_prime
     }
 
-    panRight(alpha, speed) {
+    panRight(alpha) {
         let f = new Vector3();
         f.set(this.at);         // f = at
         f.sub(this.eye);        // f = at - eye
@@ -86,6 +84,10 @@ class Camera {
         let f_prime = rotationMatrix.multiplyVector3(f);                    // f_prime = rotationMatrix * f
         this.at.set(this.eye);                                              // at = eye
         this.at.add(f_prime);                                               // at = eye + f_prime
+    }
+
+    toString() {
+        return `at: ${this.at.elements}, eye: ${this.eye.elements}, up: ${this.up.elements}`;
     }
 
 }
