@@ -202,7 +202,10 @@ function click(event) {
         sceneMatrix.setIdentity();
         // I did a little trick here, that way we can rotate in a more natural way.
         sceneMatrix.rotate(-x, 0, 1, 0);
-        sceneMatrix.rotate(y, 1, 0, 0);
+        // g_camera.setIdentity();
+        g_camera.panRight((x - (rect.width / 2)) / 200);
+        g_camera.tiltDown((y - (rect.height / 2)) / 200);
+        // sceneMatrix.rotate(y, 1, 0, 0);
     }
 }
 
