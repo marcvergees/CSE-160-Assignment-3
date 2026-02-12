@@ -11,31 +11,39 @@ Nothing.
 
 <head>
     <meta charset="utf-8" />
-    <title>My castle</title>
+    <title>My Castle</title>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: MedievalSharp for titles, Cinzel for UI text -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&display=swap"
         rel="stylesheet">
 
     <style>
         :root {
-            /* Castle Theme: Dark Stone, Night Sky, Gold Accents */
-            --primary-bg: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
-            --glass-bg: rgba(44, 62, 80, 0.6);
-            --glass-border: rgba(241, 196, 15, 0.3); /* Gold border */
-            --text-color: #ecf0f1;
-            --accent-color: #f1c40f; /* Gold accent */
+            /* Medieval color palette */
+            --bg-color: #1a1a1a;
+            --stone-dark: #2c3e50;
+            --stone-light: #526375;
+            --parchment: #f3e5ab;
+            /* Parchment white/beige for text */
+            --gold: #d4af37;
+            /* Metallic gold */
+            --gold-highlight: #f1c40f;
+            --crimson: #800000;
+            --shadow: rgba(0, 0, 0, 0.7);
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: var(--primary-bg);
-            color: var(--text-color);
+            font-family: 'Cinzel', serif;
+            /* Dark background pattern simulating a dungeon or castle interior */
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 50% 50%, #2c3e5066 0%, #000000 100%),
+                repeating-linear-gradient(45deg, #1a1a1a 0, #1a1a1a 10px, #202020 10px, #202020 20px);
+            color: var(--parchment);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -44,14 +52,20 @@ Nothing.
             overflow: hidden;
         }
 
+        /* Fancy Medieval Header */
         h1 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 3rem;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 3.5rem;
             margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            color: var(--accent-color);
+            color: var(--gold);
+            text-shadow:
+                2px 2px 0px #000,
+                0 0 10px rgba(212, 175, 55, 0.5);
+            /* Gold glow */
             letter-spacing: 2px;
             text-transform: uppercase;
+            border-bottom: 2px solid var(--crimson);
+            padding-bottom: 10px;
         }
 
         .main-container {
@@ -61,14 +75,19 @@ Nothing.
             align-items: flex-start;
             justify-content: center;
             padding: 20px;
-            backdrop-filter: blur(5px);
         }
 
+        /* Canvas Frame: Looks like a window in the castle */
         #canvas-container {
             position: relative;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            border: 5px solid rgba(241, 196, 15, 0.2); /* Gold border hint */
+            border: 8px solid var(--stone-light);
+            border-radius: 4px;
+            box-shadow:
+                inset 0 0 20px 5px #000,
+                0 10px 30px rgba(0, 0, 0, 0.9),
+                0 0 0 2px var(--gold);
+            /* Thin gold trim */
+            background: #000;
             overflow: hidden;
         }
 
@@ -77,170 +96,236 @@ Nothing.
             background-color: #000;
         }
 
+        /* Controls Panel: Stylized as a parchment or stone tablet */
         .controls-panel {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            background: rgba(30, 30, 30, 0.85);
+            /* Dark semi-transparent */
+            border: 2px solid var(--gold);
+            border-radius: 8px;
             padding: 25px;
-            width: 320px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            width: 340px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
             gap: 20px;
+            position: relative;
+        }
+
+        /* Corner decorations for the panel */
+        .controls-panel::before {
+            content: "✦";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .controls-panel::after {
+            content: "✦";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: var(--gold);
+            font-size: 1.2rem;
         }
 
         .control-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
         }
 
         label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--accent-color);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
         }
 
+        /* Custom Medieval Slider */
         input[type=range] {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
             background: transparent;
+            margin-top: 5px;
         }
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: var(--accent-color);
+            width: 12px;
+            background: var(--gold);
+            border: 1px solid #fff;
             cursor: pointer;
             margin-top: -8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-            border: 2px solid #fff;
+            border-radius: 2px;
+            /* Rectangular for a "mechanical" feel */
+            box-shadow: 0 0 5px var(--gold-highlight);
         }
 
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--stone-light);
+            border: 1px solid #000;
             border-radius: 2px;
         }
 
+        /* Toggles styled as stone buttons */
         .toggle-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.6);
             padding: 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            border: 1px solid var(--stone-light);
+            transition: border-color 0.3s;
+        }
+
+        .toggle-container:hover {
+            border-color: var(--gold);
         }
 
         input[type=checkbox] {
-            transform: scale(1.5);
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gold);
+            background: #000;
             cursor: pointer;
-            accent-color: var(--accent-color);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input[type=checkbox]:checked {
+            background: var(--crimson);
+            /* Red gem style when active */
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        input[type=checkbox]:checked::after {
+            content: '✓';
+            color: var(--gold);
+            font-size: 14px;
+            font-weight: bold;
         }
 
         .axis-legend {
             display: flex;
             gap: 15px;
-            font-size: 0.85rem;
-            margin-top: 5px;
-            background: rgba(0, 0, 0, 0.6);
+            font-size: 0.8rem;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.8);
             padding: 8px;
-            border-radius: 8px;
+            border-radius: 4px;
             justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--stone-light);
+            color: var(--parchment);
         }
 
         .axis-item {
             display: flex;
             align-items: center;
             gap: 5px;
-            color: #ddd;
+            text-transform: uppercase;
+            font-weight: bold;
         }
 
         .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            transform: rotate(45deg);
+            /* Diamond shape */
             display: inline-block;
-            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+            box-shadow: 0 0 4px currentColor;
         }
     </style>
 </head>
 
 <body onload="main()">
-    <h1>🏰 My Castle</h1>
+    <h1>My Castle</h1>
 
     <div class="main-container">
         <div id="canvas-container">
             <canvas id="webgl" width="400" height="400">
                 Please use a browser supporting "canvas"
             </canvas>
-            <div id="fps"></div>
-            <div class="axis-legend">
-                <div class="axis-item"><span class="dot" style="background:red;"></span> X</div>
-                <div class="axis-item"><span class="dot" style="background:green;"></span> Y</div>
-                <div class="axis-item"><span class="dot" style="background:blue;"></span> Z</div>
+            <div class="axis-legend"
+                style="display: flex; justify-content: center; align-items: center; flex-direction: row;">
+                <div id="fps" style="color: var(--gold); font-size: 12px; font-family: 'Courier New', monospace;">
+                </div>
+                <div class="axis-item"><span class="dot" style="background:red;"></span> X Axis</div>
+                <div class="axis-item"><span class="dot" style="background:green;"></span> Y Axis</div>
+                <div class="axis-item"><span class="dot" style="background:blue;"></span> Z Axis</div>
             </div>
         </div>
 
         <div class="controls-panel">
+            <div
+                style="text-align: center; color: var(--parchment); font-size: 0.9rem; margin-bottom: 10px; font-style: italic;">
+                -- Architecture Controls --
+            </div>
+
             <div class="control-group">
-                <label for="angleSlide">Camera Angle</label>
+                <label for="angleSlide">Perspective (Camera)</label>
                 <input type="range" min="0" max="360" value="190" class="slider" id="angleSlide" />
             </div>
 
             <div class="control-group">
-                <label for="firstFlipperAngle">First Flipper Angle</label>
+                <label for="firstFlipperAngle">Gate Mechanism I</label>
                 <input type="range" min="-45" max="45" value="0" class="slider" id="firstFlipperAngle" />
                 <div class="toggle-container" style="margin-top: 5px;">
-                    <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Activate Animation of First
-                        Flipper</label>
+                    <label for="my-toggle-firstFlipper"
+                        style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Gate I</label>
                     <input type="checkbox" id="my-toggle-firstFlipper">
                 </div>
             </div>
 
             <div class="control-group">
-                <label for="middleFlipperAngle">Middle Flipper Angle</label>
+                <label for="middleFlipperAngle">Gate Mechanism II</label>
                 <input type="range" min="-45" max="45" value="0" class="slider" id="middleFlipperAngle" />
                 <div class="toggle-container" style="margin-top: 5px;">
-                    <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Activate Animation of Middle
-                        Flipper</label>
+                    <label for="my-toggle-middleFlipper"
+                        style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Gate II</label>
                     <input type="checkbox" id="my-toggle-middleFlipper">
                 </div>
             </div>
 
             <div class="control-group">
-                <label for="secondFlipperAngle">Back Flipper Angle</label>
+                <label for="secondFlipperAngle">Drawbridge Tilt</label>
                 <input type="range" min="-45" max="45" value="0" class="slider" id="secondFlipperAngle" />
                 <div class="toggle-container" style="margin-top: 5px;">
-                    <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Activate Animation of Back
-                        Flipper</label>
+                    <label for="my-toggle-secondFlipper"
+                        style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Drawbridge</label>
                     <input type="checkbox" id="my-toggle-secondFlipper">
                 </div>
             </div>
 
-
             <div class="toggle-container">
-                <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Show Axis</label>
+                <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Show Guide Lines (Axis)</label>
                 <input type="checkbox" id="my-toggle" checked>
             </div>
+
             <div class="toggle-container">
-                <label for="my-toggle-movement" style="cursor:pointer; flex-grow: 1;">
-                    Movement Animation
-                    <span style="margin-left: 5px; cursor: help; color: #FFFFFF;"
-                        title="Every joint is being moved: shell scaled, head rotation, legs moving, and tail too">ⓘ</span>
+                <label for="my-toggle-movement" style="cursor:pointer; flex-grow: 1; color: var(--gold-highlight);">
+                    Activate All Mechanisms
                 </label>
                 <input type="checkbox" id="my-toggle-movement">
             </div>
-
-
         </div>
     </div>
 
