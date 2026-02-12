@@ -25,6 +25,7 @@ var FSHADER_SOURCE = `
     uniform sampler2D u_Sampler5;
     uniform sampler2D u_Sampler6;
     uniform sampler2D u_Sampler7;
+    uniform sampler2D u_Sampler8;
     uniform int u_whichTexture;
     void main() {
         if (u_whichTexture == -2) {
@@ -47,6 +48,8 @@ var FSHADER_SOURCE = `
             gl_FragColor = texture2D(u_Sampler6, v_UV);     // Texture 6
         } else if (u_whichTexture == 7) {
             gl_FragColor = texture2D(u_Sampler7, v_UV);     // Texture 7
+        } else if (u_whichTexture == 8) {
+            gl_FragColor = texture2D(u_Sampler8, v_UV);     // Texture 8
         } else {
             gl_FragColor = vec4(1, .2, .2, 1);              // Default color
         }
@@ -71,6 +74,7 @@ let u_Sampler4;
 let u_Sampler5;
 let u_Sampler6;
 let u_Sampler7;
+let u_Sampler8;
 let u_whichTexture;
 
 let g_showAxis = true;
@@ -104,8 +108,8 @@ var g_map = [
     [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 3
     [7, 6, 7, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 7, 6, 7],    // Row 4
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 1.2, 3.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 2.2, 1.2, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 4],
@@ -143,7 +147,9 @@ function drawMap() {
                 var cube = new Cube();
                 // cube.color = [.5, .5, .5, 1];
                 var decimal = Math.round((g_map[x][y] - height_to_get) * 10) / 10;
-                if (decimal == .3) {
+                if (decimal == .2) {
+                    cube.textureNum = 0;
+                } else if (decimal == .3) {
                     cube.textureNum = 3;
                 } else if (decimal == .4) {
                     cube.textureNum = 4;
@@ -282,6 +288,11 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of u_Sampler7');
         return;
     }
+    u_Sampler8 = gl.getUniformLocation(gl.program, 'u_Sampler8');
+    if (u_Sampler8 < 0) {
+        console.log('Failed to get the storage location of u_Sampler8');
+        return;
+    }
     u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture');
     if (!u_whichTexture) {
         console.log('Failed to get the storage location of u_whichTexture');
@@ -393,6 +404,14 @@ function initTextures() {
     }
     image7.onload = function () { sendImageToTEXTURE7(image7); };
     image7.src = '../img/tnt.webp';
+
+    var image8 = new Image();
+    if (!image8) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image8.onload = function () { sendImageToTEXTURE8(image8); };
+    image8.src = '../img/terrain.webp';
 
     return true;
 }
@@ -506,6 +525,20 @@ function sendImageToTEXTURE7(image) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(u_Sampler7, 7);
+}
+
+function sendImageToTEXTURE8(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE8);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler8, 8);
 }
 
 function initCamera() {
@@ -853,7 +886,7 @@ function renderScene() {
 
     var floor = new Cube();
     floor.color = [1, 0, 0, 1];
-    floor.textureNum = 0;
+    floor.textureNum = 8;
     floor.matrix.translate(0, -.75, 0);
     floor.matrix.scale(50, 0, 50);
     floor.matrix.translate(-.5, 0, -.5);
