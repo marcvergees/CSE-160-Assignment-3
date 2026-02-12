@@ -23,6 +23,8 @@ var FSHADER_SOURCE = `
     uniform sampler2D u_Sampler3;
     uniform sampler2D u_Sampler4;
     uniform sampler2D u_Sampler5;
+    uniform sampler2D u_Sampler6;
+    uniform sampler2D u_Sampler7;
     uniform int u_whichTexture;
     void main() {
         if (u_whichTexture == -2) {
@@ -41,6 +43,10 @@ var FSHADER_SOURCE = `
             gl_FragColor = texture2D(u_Sampler4, v_UV);     // Texture 4
         } else if (u_whichTexture == 5) {
             gl_FragColor = texture2D(u_Sampler5, v_UV);     // Texture 5
+        } else if (u_whichTexture == 6) {
+            gl_FragColor = texture2D(u_Sampler6, v_UV);     // Texture 6
+        } else if (u_whichTexture == 7) {
+            gl_FragColor = texture2D(u_Sampler7, v_UV);     // Texture 7
         } else {
             gl_FragColor = vec4(1, .2, .2, 1);              // Default color
         }
@@ -63,6 +69,8 @@ let u_Sampler2;
 let u_Sampler3;
 let u_Sampler4;
 let u_Sampler5;
+let u_Sampler6;
+let u_Sampler7;
 let u_whichTexture;
 
 let g_showAxis = true;
@@ -88,45 +96,48 @@ let stats;
 
 var g_startTime = performance.now() / 1000.0;
 var g_seconds = performance.now() / 1000.0 - g_startTime;
-
 var g_map = [
-    [7, 5, 5, 4, 4, 3, 4, 4, 3, 4, 4, 3, 4, 4, 3, 0, 0, 3, 4, 4, 3, 4, 4, 3, 4, 4, 3, 4, 4, 5, 5, 7],
-    [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    // ENTRANCE 
+    [7, 6, 7, 6, 7, 3, 4, 4, 3, 6, 6, 3, 4, 6.3, 8.3, 0, 0, 8.3, 6.3, 4, 3, 6, 6, 3, 4, 4, 3, 7, 6, 7, 6, 7],   // Row 0
+    [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 1
+    [7, 5.3, 5.3, 5.3, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5.3, 5.3, 5.3, 7],    // Row 2
+    [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 3
+    [7, 6, 7, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 7, 6, 7],    // Row 4
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 8.4, 8.4, 0, 0, 0, 0, 8.4, 8.4, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 0, 0, 8.4, 9.4, 0, 0, 0, 0, 9.4, 8.4, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 0, 0, 0, 0, 0, 0, 1.5, 2.5, 2.5, 1.5, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 2, 4.3, 0, 0, 0, 0, 0, 0, 1.5, 2.5, 2.5, 1.5, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 0, 0, 8.4, 9.4, 0, 0, 0, 0, 9.4, 8.4, 0, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 8.4, 8.4, 0, 0, 0, 0, 8.4, 8.4, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 0, 0, 0, 0, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 6.4, 6.4, 0, 0, 0, 0, 6.4, 6.4, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 2.7, 1.7, 0, 0, 0, 0, 1.7, 2.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 1.7, 0, 0, 0, 0, 0, 0, 1.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 6.4, 0, 0, 0, 0, 0, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 6.4, 0, 0, 0, 1.6, 1.6, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 2, 4.3, 6.4, 0, 0, 0, 1.6, 1.6, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 0, 0, 0, 0, 0, 0, 0, 0, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 1.7, 0, 0, 0, 0, 0, 0, 1.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 2.7, 1.7, 0, 0, 0, 0, 1.7, 2.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 6.4, 6.4, 0, 0, 0, 0, 6.4, 6.4, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 0, 0, 0, 0, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-    [7, 5, 5, 4, 4, 3, 4, 4, 3, 4, 4, 3, 4, 4, 3, 0, 0, 3, 4, 4, 3, 4, 4, 3, 4, 4, 3, 4, 4, 5, 5, 7],
+    [7, 6, 7, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 7, 6, 7],    // Row 27
+    [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 28
+    [7, 5.3, 5.3, 5.3, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5.3, 5.3, 5.3, 7],    // Row 29
+    [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 30
+    [7, 6, 7, 6, 7, 3, 4, 4, 3, 6, 6, 3, 4, 6.3, 6.3, 0, 0, 6.3, 6.3, 4, 3, 6, 6, 3, 4, 4, 3, 7, 6, 7, 6, 7],   // Row 31 (bottom): Mirrored from Row 0
 ];
 
 function drawMap() {
     for (let x = 0; x < g_map.length; x++) {
         for (let y = 0; y < g_map[x].length; y++) {
+            if (g_map[x].length != 32) {
+                console.log(g_map[x].length, x);
+            }
             let height_to_get = parseInt(g_map[x][y]);
             for (let height = 0; height < height_to_get; height++) {
                 var cube = new Cube();
@@ -138,6 +149,10 @@ function drawMap() {
                     cube.textureNum = 4;
                 } else if (decimal == .5) {
                     cube.textureNum = 5;
+                } else if (decimal == .6) {
+                    cube.textureNum = 6;
+                } else if (decimal == .7) {
+                    cube.textureNum = 7;
                 } else {
                     cube.textureNum = 2;
                 }
@@ -257,6 +272,16 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of u_Sampler5');
         return;
     }
+    u_Sampler6 = gl.getUniformLocation(gl.program, 'u_Sampler6');
+    if (u_Sampler6 < 0) {
+        console.log('Failed to get the storage location of u_Sampler6');
+        return;
+    }
+    u_Sampler7 = gl.getUniformLocation(gl.program, 'u_Sampler7');
+    if (u_Sampler7 < 0) {
+        console.log('Failed to get the storage location of u_Sampler7');
+        return;
+    }
     u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture');
     if (!u_whichTexture) {
         console.log('Failed to get the storage location of u_whichTexture');
@@ -353,7 +378,22 @@ function initTextures() {
     image5.onload = function () { sendImageToTEXTURE5(image5); };
     image5.src = '../img/diamond.png';
 
-    // Add more texture loading here if we need to
+    var image6 = new Image();
+    if (!image6) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image6.onload = function () { sendImageToTEXTURE6(image6); };
+    image6.src = '../img/chest.png';
+
+    var image7 = new Image();
+    if (!image7) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image7.onload = function () { sendImageToTEXTURE7(image7); };
+    image7.src = '../img/tnt.webp';
+
     return true;
 }
 
@@ -438,6 +478,34 @@ function sendImageToTEXTURE5(image) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(u_Sampler5, 5);
+}
+
+function sendImageToTEXTURE6(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE6);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler6, 6);
+}
+
+function sendImageToTEXTURE7(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE7);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler7, 7);
 }
 
 function initCamera() {
