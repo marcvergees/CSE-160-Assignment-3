@@ -7,11 +7,36 @@ class Camera {
         this.viewMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4();
         this.initialize_view_projection_matrices();
+        this.gravity = 0.015;
+        this.velocityY = 0;
+        this.isJumping = false;
     }
 
     initialize_view_projection_matrices() {
         this.viewMatrix.setLookAt(this.eye, this.at, this.up);
         this.projectionMatrix.setPerspective(this.fov, canvas.width / canvas.height, .1, 100);
+    }
+
+    jump() {
+        if (!this.isJumping) {
+            this.velocityY = 0.2;
+            this.isJumping = true;
+        }
+    }
+
+    update() {
+        this.eye.elements[1] += this.velocityY;
+        this.at.elements[1] += this.velocityY;
+        this.velocityY -= this.gravity;
+
+        // Ground collision (assuming ground is at y=0)
+        if (this.eye.elements[1] <= 0) {
+            let diff = 0 - this.eye.elements[1];
+            this.eye.elements[1] += diff;
+            this.at.elements[1] += diff;
+            this.velocityY = 0;
+            this.isJumping = false;
+        }
     }
 
     moveForward(speed) {

@@ -669,6 +669,8 @@ function keydown(ev) {
         if (!checkCollision(targetEye)) {
             g_camera.moveRight(speed);
         }
+    } else if (ev.keyCode == 32) { // Space - Jump
+        g_camera.jump();
     }
 
     // CAMERA ROTATION
@@ -688,11 +690,13 @@ function keydown(ev) {
         g_camera.reset();
     }
     renderScene();
+
 }
 
 function tick() {
     g_seconds = performance.now() / 1000.0 - g_startTime;
     updateAnimationAngles();
+    g_camera.update(); // Update camera physics (gravity, jump)
     stats.begin();
     renderScene();
     stats.end();
