@@ -1,6 +1,10 @@
 Light/Dark Mode -> change sky and floor
 Add Instructions of camera and character movement
 Add medieval music
+
+PARTIALLY DONE
 Not entering blocks
+Space implements jump (partially done)
+
+LAST STEP
 Refactoring world.js
-Space implements jump

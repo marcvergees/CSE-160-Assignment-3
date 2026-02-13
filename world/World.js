@@ -600,18 +600,23 @@ function main() {
 
 function checkCollision(targetPosition) {
     let x = targetPosition.elements[0];
+    let y = targetPosition.elements[1];
     let z = targetPosition.elements[2];
 
     let mapX = z > 0 ? Math.round(x) + 16 : Math.floor(x) + 15;
+    let mapY = y > 0 ? Math.round(y) + 16 : Math.floor(y) + 15;
     let mapZ = z > 0 ? Math.round(z) + 16 : Math.floor(z) + 15;
 
     if (mapX >= 0 && mapX < 32 && mapZ >= 0 && mapZ < 32) {
-        if (g_map[mapX][mapZ] > 1) { // If block height > 1 (wall), collision!
+        if (g_map[mapX][mapZ] > mapY) { // If block height > 1 (wall), collision!
             return true;
         }
     }
     return false;
 }
+
+const DBL_PRESS_THRESHOLD = 1000;
+let lastKeypressTime = 0;
 
 function keydown(ev) {
     // KEYBOARD CONTROLS
@@ -622,7 +627,7 @@ function keydown(ev) {
 
     let targetEye = new Vector3(g_camera.eye.elements);
     let targetAt = new Vector3(g_camera.at.elements);
-    let speed = 0.1;
+    let speed = 0.2;
 
     // CAMERA MOVEMENT - Predict next position
     if (ev.keyCode == 87) { // W - Forward
@@ -670,18 +675,24 @@ function keydown(ev) {
             g_camera.moveRight(speed);
         }
     } else if (ev.keyCode == 32) { // Space - Jump
+        var thisKeypressTime = new Date();
+        if (thisKeypressTime - lastKeypressTime <= DBL_PRESS_THRESHOLD) {
+            g_camera.doubleJump();
+            thisKeypressTime = 0;
+        }
+        lastKeypressTime = thisKeypressTime;
         g_camera.jump();
     }
 
     // CAMERA ROTATION
     else if (ev.keyCode == 81 || ev.keyCode == 37) { // Q or left arrow
-        g_camera.panLeft(2);
+        g_camera.panLeft(4);
     } else if (ev.keyCode == 69 || ev.keyCode == 39) { // E or right arrow
-        g_camera.panRight(2);
+        g_camera.panRight(4);
     } else if (ev.keyCode == 38) { // Up arrow
-        g_camera.tiltUp(2);
+        g_camera.tiltUp(4);
     } else if (ev.keyCode == 40) { // Down arrow
-        g_camera.tiltDown(2);
+        g_camera.tiltDown(4);
     }
 
 
@@ -696,7 +707,7 @@ function keydown(ev) {
 function tick() {
     g_seconds = performance.now() / 1000.0 - g_startTime;
     updateAnimationAngles();
-    g_camera.update(); // Update camera physics (gravity, jump)
+    g_camera.update(g_map); // Update camera physics (gravity, jump)
     stats.begin();
     renderScene();
     stats.end();

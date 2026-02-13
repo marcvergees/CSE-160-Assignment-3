@@ -19,19 +19,29 @@ class Camera {
 
     jump() {
         if (!this.isJumping) {
-            this.velocityY = 0.2;
+            this.velocityY = 0.3; // it has to be 0.2
+            this.isJumping = true;
+        }
+    }
+    doubleJump() {
+        if (!this.isJumping) {
+            this.velocityY = 0.8; // it has to be 0.2
             this.isJumping = true;
         }
     }
 
-    update() {
+
+    update(map) {
         this.eye.elements[1] += this.velocityY;
         this.at.elements[1] += this.velocityY;
         this.velocityY -= this.gravity;
 
-        // Ground collision (assuming ground is at y=0)
-        if (this.eye.elements[1] <= 0) {
-            let diff = 0 - this.eye.elements[1];
+        let mapX = this.eye.elements[0] > 0 ? Math.round(this.eye.elements[0]) + 16 : Math.floor(this.eye.elements[0]) + 15;
+        let mapZ = this.eye.elements[2] > 0 ? Math.round(this.eye.elements[2]) + 16 : Math.floor(this.eye.elements[2]) + 15;
+
+        // Ground collision (assuming ground is at map[x][z])
+        if (this.eye.elements[1] <= map[mapX][mapZ]) {
+            let diff = map[mapX][mapZ] - this.eye.elements[1];
             this.eye.elements[1] += diff;
             this.at.elements[1] += diff;
             this.velocityY = 0;
