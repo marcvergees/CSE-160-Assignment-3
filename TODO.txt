@@ -1,10 +1,9 @@
 Light/Dark Mode -> change sky and floor
 Add Instructions of camera and character movement
 Add medieval music
+Parkour zone
+Add 3D obj (ghost) and gets closer
 
-PARTIALLY DONE
-Not entering blocks
-Space implements jump (partially done)
 
 LAST STEP
 Refactoring world.js

@@ -258,85 +258,108 @@ Nothing.
 </head>
 
 <body onload="main()">
-    <h1>My Castle</h1>
 
-    <div class="main-container">
-        <div id="canvas-container">
-            <canvas id="webgl" width="500" height="500">
-                Please use a browser supporting "canvas"
-            </canvas>
-            <div class="axis-legend"
-                style="display: flex; justify-content: center; align-items: center; flex-direction: row;">
-                <div id="fps" style="color: var(--gold); font-size: 12px; font-family: 'Courier New', monospace;">
+    <div id="loader"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;">
+        <h1 id="titleInfo1">Ancient Whispers...</h1>
+        <h1 id="titleInfo2">Are Calling</h1>
+        <button id="enterButton" style="
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.5rem;
+            background: var(--crimson);
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--shadow);
+            transition: all 0.3s;
+        ">BEGIN JOURNEY</button>
+    </div>
+    <audio id="bckMusic" style="display: none;" loop>
+        <source src="../music/Aria_Math.ogg" type="audio/ogg">
+    </audio>
+
+    <div id="main-container" class="main-container" style="display: none; flex-direction: column; align-items: center;">
+        <h1>My Castle</h1>
+        <div style="display: flex; flex-direction: row; gap: 40px;">
+            <div id="canvas-container">
+                <canvas id="webgl" width="500" height="500">
+                    Please use a browser supporting "canvas"
+                </canvas>
+                <div class="axis-legend"
+                    style="display: flex; justify-content: center; align-items: center; flex-direction: row;">
+                    <div id="fps" style="color: var(--gold); font-size: 12px; font-family: 'Courier New', monospace;">
+                    </div>
+                    <div class="axis-item"><span class="dot" style="background:red;"></span> X Axis</div>
+                    <div class="axis-item"><span class="dot" style="background:green;"></span> Y Axis</div>
+                    <div class="axis-item"><span class="dot" style="background:blue;"></span> Z Axis</div>
                 </div>
-                <div class="axis-item"><span class="dot" style="background:red;"></span> X Axis</div>
-                <div class="axis-item"><span class="dot" style="background:green;"></span> Y Axis</div>
-                <div class="axis-item"><span class="dot" style="background:blue;"></span> Z Axis</div>
-            </div>
-            <div class="axis-legend" id="mapCoordinates1">
-            </div>
-            <div class="axis-legend" id="mapCoordinates2">
-            </div>
-            <div class="axis-legend" id="eyeCoordinates">
-            </div>
-            <div class="axis-legend" id="atCoordinates">
-            </div>
-            <div class="axis-legend" id="upCoordinates">
-            </div>
-        </div>
-
-        <div class="controls-panel">
-            <div
-                style="text-align: center; color: var(--parchment); font-size: 0.9rem; margin-bottom: 10px; font-style: italic;">
-                -- Architecture Controls --
-            </div>
-
-            <div class="control-group">
-                <label for="angleSlide">Perspective (Camera)</label>
-                <input type="range" min="0" max="360" value="190" class="slider" id="angleSlide" />
-            </div>
-
-            <div class="control-group">
-                <label for="firstFlipperAngle">Gate Mechanism I</label>
-                <input type="range" min="-45" max="45" value="0" class="slider" id="firstFlipperAngle" />
-                <div class="toggle-container" style="margin-top: 5px;">
-                    <label for="my-toggle-firstFlipper"
-                        style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Gate I</label>
-                    <input type="checkbox" id="my-toggle-firstFlipper">
+                <div class="axis-legend" id="mapCoordinates1">
                 </div>
-            </div>
-
-            <div class="control-group">
-                <label for="middleFlipperAngle">Gate Mechanism II</label>
-                <input type="range" min="-45" max="45" value="0" class="slider" id="middleFlipperAngle" />
-                <div class="toggle-container" style="margin-top: 5px;">
-                    <label for="my-toggle-middleFlipper"
-                        style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Gate II</label>
-                    <input type="checkbox" id="my-toggle-middleFlipper">
+                <div class="axis-legend" id="mapCoordinates2">
+                </div>
+                <div class="axis-legend" id="eyeCoordinates">
+                </div>
+                <div class="axis-legend" id="atCoordinates">
+                </div>
+                <div class="axis-legend" id="upCoordinates">
                 </div>
             </div>
 
-            <div class="control-group">
-                <label for="secondFlipperAngle">Drawbridge Tilt</label>
-                <input type="range" min="-45" max="45" value="0" class="slider" id="secondFlipperAngle" />
-                <div class="toggle-container" style="margin-top: 5px;">
-                    <label for="my-toggle-secondFlipper"
-                        style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Drawbridge</label>
-                    <input type="checkbox" id="my-toggle-secondFlipper">
+            <div class="controls-panel">
+                <div
+                    style="text-align: center; color: var(--parchment); font-size: 0.9rem; margin-bottom: 10px; font-style: italic;">
+                    -- Architecture Controls --
                 </div>
+
+                <div class="control-group">
+                    <label for="angleSlide">Perspective (Camera)</label>
+                    <input type="range" min="0" max="360" value="190" class="slider" id="angleSlide" />
+                </div>
+
+                <div class="control-group">
+                    <label for="volumeSlide">Volume (Music)</label>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="volumeSlide" />
+                </div>
+
+                <!-- <div class="control-group">
+                    <label for="firstFlipperAngle">Gate Mechanism I</label>
+                    <input type="range" min="-45" max="45" value="0" class="slider" id="firstFlipperAngle" />
+                    <div class="toggle-container" style="margin-top: 5px;">
+                        <label for="my-toggle-firstFlipper"
+                            style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Gate I</label>
+                        <input type="checkbox" id="my-toggle-firstFlipper">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="middleFlipperAngle">Gate Mechanism II</label>
+                    <input type="range" min="-45" max="45" value="0" class="slider" id="middleFlipperAngle" />
+                    <div class="toggle-container" style="margin-top: 5px;">
+                        <label for="my-toggle-middleFlipper"
+                            style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Gate II</label>
+                        <input type="checkbox" id="my-toggle-middleFlipper">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="secondFlipperAngle">Drawbridge Tilt</label>
+                    <input type="range" min="-45" max="45" value="0" class="slider" id="secondFlipperAngle" />
+                    <div class="toggle-container" style="margin-top: 5px;">
+                        <label for="my-toggle-secondFlipper"
+                            style="cursor:pointer; flex-grow: 1; font-size: 0.8rem;">Automate Drawbridge</label>
+                        <input type="checkbox" id="my-toggle-secondFlipper">
+                    </div>
+                </div> -->
+
+                <div class="toggle-container">
+                    <label for="my-toggle-music" style="cursor:pointer; flex-grow: 1;">Mute Music</label>
+                    <input type="checkbox" id="my-toggle-music">
+                </div>
+
             </div>
 
-            <div class="toggle-container">
-                <label for="my-toggle" style="cursor:pointer; flex-grow: 1;">Show Guide Lines (Axis)</label>
-                <input type="checkbox" id="my-toggle" checked>
-            </div>
-
-            <div class="toggle-container">
-                <label for="my-toggle-movement" style="cursor:pointer; flex-grow: 1; color: var(--gold-highlight);">
-                    Activate All Mechanisms
-                </label>
-                <input type="checkbox" id="my-toggle-movement">
-            </div>
         </div>
     </div>
 

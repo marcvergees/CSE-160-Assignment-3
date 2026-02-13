@@ -40,7 +40,7 @@ class Camera {
         let mapZ = this.eye.elements[2] > 0 ? Math.round(this.eye.elements[2]) + 16 : Math.floor(this.eye.elements[2]) + 15;
 
         // Ground collision (assuming ground is at map[x][z])
-        if (this.eye.elements[1] <= map[mapX][mapZ]) {
+        if (0 <= mapX && mapX < 32 && 0 <= mapZ && mapZ < 32 && this.eye.elements[1] <= map[mapX][mapZ]) {
             let diff = map[mapX][mapZ] - this.eye.elements[1];
             this.eye.elements[1] += diff;
             this.at.elements[1] += diff;
