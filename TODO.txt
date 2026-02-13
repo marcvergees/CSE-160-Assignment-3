@@ -3,3 +3,4 @@ Add Instructions of camera and character movement
 Add medieval music
 Not entering blocks
 Refactoring world.js
+Space implements jump

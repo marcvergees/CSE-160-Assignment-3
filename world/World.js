@@ -91,11 +91,8 @@ let g_animationFirstFlipper = false;
 let g_animationSecondFlipper = false;
 let g_animationMiddleFlipper = false;
 let g_animationMovement = false;
-let g_pokeAnimation = false;
-let g_pokeStartTime = 0;
 
 let g_camera;
-let sceneMatrix = new Matrix4();
 let stats;
 
 var g_startTime = performance.now() / 1000.0;
@@ -112,20 +109,20 @@ var g_map = [
     [4, 0, 0, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 0, 0, 0, 0, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 6.4, 6.4, 0, 0, 0, 0, 6.4, 6.4, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 2.7, 1.7, 0, 0, 0, 0, 1.7, 2.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 1.7, 0, 0, 0, 0, 0, 0, 1.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 1.2, 1.2, 0, 0, 0, 4, 4.3, 6.4, 0, 0, 0, 0, 0, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 6.4, 0, 0, 0, 1.6, 1.6, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 2, 4.3, 6.4, 0, 0, 0, 1.6, 1.6, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 0, 0, 0, 0, 0, 0, 0, 0, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 1.7, 0, 0, 0, 0, 0, 0, 1.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 2.7, 1.7, 0, 0, 0, 0, 1.7, 2.7, 6.4, 4.3, 0, 0, 0, 0, 1.2, 2.2, 0, 0, 0, 0, 3],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 6.4, 6.4, 0, 0, 0, 0, 6.4, 6.4, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
-    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 0, 0, 0, 0, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [3, 0, 0, 0, 2.2, 1.2, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.3, 1.3, 1.3, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.3, 1.4, 1.4, 1.4, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 0, 1.3, 1.4, 2.7, 1.7, 0, 0, 0, 0, 0, 0, 0, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0, 1.3, 1.4, 1.7, 0, 0, 0, 0, 0, 0, 0, 0, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 1.2, 1.2, 0, 0, 0, 4, 1.3, 1.4, 0, 0, 0, 0, 1.1, 0, 0, 0, 0, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 4, 1.3, 1.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 2, 1.3, 1.4, 0, 0, 0, 0, 0, 0, 0, 0, 1.4, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.3, 1.4, 0, 0, 0, 0, 0, 0, 0, 0, 1.4, 1.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 0, 1.3, 1.4, 1.7, 0, 0, 0, 0, 0, 0, 0, 1.4, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0, 1.4, 1.4, 2.7, 1.7, 0, 0, 0, 0, 0, 2.7, 1.4, 1.3, 0, 0, 0, 0, 1.2, 2.2, 0, 0, 0, 0, 3],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.4, 1.4, 1.4, 1.4, 1.4, 0, 0, 0, 0, 0, 1.4, 1.4, 1.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [4, 0, 0, 0, 0, 0, 0, 0, 1.4, 1.4, 1.4, 1.4, 1.4, 0, 0, 0, 0, 0, 1.3, 1.3, 1.3, 1.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [3, 0, 0, 0, 2.2, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
@@ -135,6 +132,41 @@ var g_map = [
     [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 30
     [7, 6, 7, 6, 7, 3, 4, 4, 3, 6, 6, 3, 4, 6.3, 6.3, 0, 0, 6.3, 6.3, 4, 3, 6, 6, 3, 4, 4, 3, 7, 6, 7, 6, 7],   // Row 31 (bottom): Mirrored from Row 0
 ];
+// var g_map = [
+//     // ENTRANCE 
+//     [7, 6, 7, 6, 7, 3, 4, 4, 3, 6, 6, 3, 6.3, 8.3, 0, 0, 0, 0, 8.3, 6.3, 3, 6, 6, 3, 4, 4, 3, 7, 6, 7, 6, 7],   // Row 0
+//     [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 1
+//     [7, 5.3, 5.3, 5.3, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5.3, 5.3, 5.3, 7],    // Row 2
+//     [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 3
+//     [7, 6, 7, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 7, 6, 7],    // Row 4
+//     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [4, 0, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [4, 0, 0, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [3, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 0, 0, 0, 0, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 6.4, 6.4, 0, 0, 0, 0, 6.4, 6.4, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 2.7, 1.7, 0, 0, 0, 0, 1.7, 2.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 1.7, 0, 0, 0, 0, 0, 0, 1.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [4, 0, 0, 1.2, 1.2, 0, 0, 0, 4, 4.3, 6.4, 0, 0, 0, 0, 1.6, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 4, 4.3, 6.4, 0, 0, 0, 0, 0, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [3, 0, 0, 0, 0, 0, 0, 0, 2, 4.3, 6.4, 0, 0, 0, 0, 0, 0, 0, 0, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 0, 0, 0, 0, 0, 0, 0, 0, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 1.7, 0, 0, 0, 0, 0, 0, 1.7, 6.4, 4.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [3, 0, 0, 0, 0, 0, 0, 0, 0, 4.3, 6.4, 2.7, 1.7, 0, 0, 0, 0, 1.7, 2.7, 6.4, 4.3, 0, 0, 0, 0, 1.2, 2.2, 0, 0, 0, 0, 3],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 4.3, 6.4, 6.4, 6.4, 0, 0, 0, 0, 6.4, 6.4, 6.4, 4.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 1.5, 6.3, 4.3, 4.3, 4.3, 0, 0, 0, 0, 4.3, 4.3, 4.3, 4.3, 6.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [3, 0, 0, 0, 2.2, 1.2, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+//     [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+//     [7, 6, 7, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0, 7, 6, 7, 6, 7],    // Row 27
+//     [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.2, 1.2, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 28
+//     [7, 5.3, 5.3, 5.3, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 5.3, 5.3, 5.3, 7],    // Row 29
+//     [6, 5.3, 5.3, 5.3, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 5.3, 5.3, 5.3, 6],    // Row 30
+//     [7, 6, 7, 6, 7, 3, 4, 4, 3, 6, 6, 3, 4, 6.3, 6.3, 0, 0, 6.3, 6.3, 4, 3, 6, 6, 3, 4, 4, 3, 7, 6, 7, 6, 7],   // Row 31 (bottom): Mirrored from Row 0
+// ];
 
 function drawMap() {
     for (let x = 0; x < g_map.length; x++) {
@@ -192,20 +224,19 @@ function createStats() {
 }
 
 function click(event) {
-    if (event.shiftKey) {
-        g_pokeAnimation = true;
-        g_pokeStartTime = g_seconds;
+    if (event.shiftKey) { // We build a new block
+        var x = Math.floor(g_camera.eye.elements[0]);
+        var y = Math.floor(g_camera.eye.elements[1]);
+        var z = Math.floor(g_camera.eye.elements[2]);
+        g_map[x + 15][z + 15] = 1.2;
+        console.log("Block built at (x:", x, ", y:", z, ")");
     } else {
         var rect = canvas.getBoundingClientRect();
         var x = event.clientX - rect.left;
         var y = event.clientY - rect.top;
-        sceneMatrix.setIdentity();
         // I did a little trick here, that way we can rotate in a more natural way.
-        sceneMatrix.rotate(-x, 0, 1, 0);
-        // g_camera.setIdentity();
         g_camera.panRight((x - (rect.width / 2)) / 200);
         g_camera.tiltDown((y - (rect.height / 2)) / 200);
-        // sceneMatrix.rotate(y, 1, 0, 0);
     }
 }
 
@@ -546,7 +577,7 @@ function sendImageToTEXTURE8(image) {
 
 function initCamera() {
     g_camera = new Camera();
-    g_camera.eye = new Vector3([0, 0, 3]);
+    g_camera.eye = new Vector3([0, 0, 0]);
     g_camera.at = new Vector3([0, 0, -100]);
     g_camera.up = new Vector3([0, 1, 0]);
 }
@@ -567,6 +598,21 @@ function main() {
     requestAnimationFrame(tick);
 }
 
+function checkCollision(targetPosition) {
+    let x = targetPosition.elements[0];
+    let z = targetPosition.elements[2];
+
+    let mapX = z > 0 ? Math.round(x) + 16 : Math.floor(x) + 15;
+    let mapZ = z > 0 ? Math.round(z) + 16 : Math.floor(z) + 15;
+
+    if (mapX >= 0 && mapX < 32 && mapZ >= 0 && mapZ < 32) {
+        if (g_map[mapX][mapZ] > 1) { // If block height > 1 (wall), collision!
+            return true;
+        }
+    }
+    return false;
+}
+
 function keydown(ev) {
     // KEYBOARD CONTROLS
     // WASD for camera movement
@@ -574,16 +620,55 @@ function keydown(ev) {
     // Arrow keys for vertical and horizontal camera rotation
     // P for camera reset
 
+    let targetEye = new Vector3(g_camera.eye.elements);
+    let targetAt = new Vector3(g_camera.at.elements);
+    let speed = 0.1;
 
-    // CAMERA MOVEMENT
-    if (ev.keyCode == 87) { // W
-        g_camera.moveForward(0.1);
-    } else if (ev.keyCode == 83) { // S
-        g_camera.moveBackwards(0.1);
-    } else if (ev.keyCode == 65) { // A
-        g_camera.moveLeft(0.1);
-    } else if (ev.keyCode == 68) { // D
-        g_camera.moveRight(0.1);
+    // CAMERA MOVEMENT - Predict next position
+    if (ev.keyCode == 87) { // W - Forward
+        let f = new Vector3();
+        f.set(g_camera.at);
+        f.sub(g_camera.eye);
+        f.normalize();
+        f.mul(speed);
+        targetEye.add(f);
+        if (!checkCollision(targetEye)) {
+            g_camera.moveForward(speed);
+        }
+    } else if (ev.keyCode == 83) { // S - Backward
+        let b = new Vector3();
+        b.set(g_camera.eye);
+        b.sub(g_camera.at);
+        b.normalize();
+        b.mul(speed);
+        targetEye.add(b);
+        if (!checkCollision(targetEye)) {
+            g_camera.moveBackwards(speed);
+        }
+    } else if (ev.keyCode == 65) { // A - Left
+        let f = new Vector3();
+        f.set(g_camera.at);
+        f.sub(g_camera.eye);
+        let s = new Vector3();
+        s.set(Vector3.cross(g_camera.up, f));
+        s.normalize();
+        s.mul(speed);
+        targetEye.add(s);
+        if (!checkCollision(targetEye)) {
+            g_camera.moveLeft(speed);
+        }
+    } else if (ev.keyCode == 68) { // D - Right
+        let f = new Vector3();
+        f.set(g_camera.at);
+        f.sub(g_camera.eye);
+        let s = new Vector3();
+        s.set(Vector3.cross(f, g_camera.up));
+        s.normalize();
+        s.mul(speed);
+        targetEye.add(s);
+        if (!checkCollision(targetEye)) {
+            g_camera.moveRight(speed);
+        }
     }
 
     // CAMERA ROTATION
@@ -856,19 +941,6 @@ function drawTurtle(matrix) {
 }
 
 function renderScene() {
-    if (g_pokeAnimation) {
-        let timeElapsed = g_seconds - g_pokeStartTime;
-        if (timeElapsed > 1.0) {
-            g_pokeAnimation = false;
-        } else {
-            // Jump up and down
-            let jumpHeight = Math.sin(timeElapsed * Math.PI);
-            globalRotMat.translate(0, jumpHeight, 0);
-            // Spin around Y axis (3 full rotations)
-            globalRotMat.rotate(timeElapsed * 360 * 3, 0, 1, 0);
-        }
-    }
-
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var projMat = new Matrix4();
@@ -876,9 +948,7 @@ function renderScene() {
     gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
 
     var viewMat = new Matrix4();
-    // console.log(g_camera.toString());
     viewMat.lookAt(g_camera.eye.elements[0], g_camera.eye.elements[1], g_camera.eye.elements[2], g_camera.at.elements[0], g_camera.at.elements[1], g_camera.at.elements[2], g_camera.up.elements[0], g_camera.up.elements[1], g_camera.up.elements[2]); // (eye, at, up)
-    // console.log(g_camera.toString());
     gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
 
     var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
@@ -901,16 +971,11 @@ function renderScene() {
     sky.matrix.translate(-.5, -.5, -.5);
     sky.render();
 
-    var cube = new Cube();
-    cube.color = green_body;
-    cube.matrix = new Matrix4(sceneMatrix);
-    cube.matrix.scale(.5, .5, .5);
-    cube.render();
-
     drawMap();
 
     var endTime = performance.now();
     sendTextToHTML("ms: " + Math.floor(endTime - startTime) + " fps: " + Math.floor(1000 / (endTime - startTime)), "fps");
+    sendMapCoordinatesToHTML();
 }
 
 function sendTextToHTML(text, htmlID) {
@@ -920,5 +985,34 @@ function sendTextToHTML(text, htmlID) {
         return;
     }
     element.innerText = text;
+}
+
+function sendMapCoordinatesToHTML() {
+    x = g_camera.eye.elements[0];
+    y = g_camera.eye.elements[1];
+    z = g_camera.eye.elements[2];
+    x_prime = Math.floor(x);
+    y_prime = Math.floor(y);
+    z_prime = Math.floor(z);
+    sendTextToHTML("x: " + x_prime + " y: " + y_prime + " z: " + z_prime + "(" + x + "," + y + "," + z + ")", "eyeCoordinates");
+
+    at1 = g_camera.at.elements[0];
+    at2 = g_camera.at.elements[1];
+    at3 = g_camera.at.elements[2];
+    at1_prime = Math.floor(at1);
+    at2_prime = Math.floor(at2);
+    at3_prime = Math.floor(at3);
+    sendTextToHTML("at: " + at1_prime + " at: " + at2_prime + " at: " + at3_prime, "atCoordinates");
+
+    up1 = g_camera.up.elements[0];
+    up2 = g_camera.up.elements[1];
+    up3 = g_camera.up.elements[2];
+    up1_prime = Math.floor(up1);
+    up2_prime = Math.floor(up2);
+    up3_prime = Math.floor(up3);
+    sendTextToHTML("up: " + up1_prime + " up: " + up2_prime + " up: " + up3_prime, "upCoordinates");
+
+    sendTextToHTML("Map: (15,15): " + g_map[15 + x_prime][15 + z_prime], "mapCoordinates1");
+    sendTextToHTML("Map: (16,16): " + g_map[16 + x_prime][16 + z_prime], "mapCoordinates2");
 }
 
