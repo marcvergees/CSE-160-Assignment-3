@@ -592,6 +592,7 @@ function main() {
     canvas.onmousedown = click;
     canvas.onmousemove = function (ev) { if (ev.buttons == 1) click(ev); }; // if we remove ev.buttons == 1, we can drag the mouse without clicking. But we want click+drag to work.
     document.onkeydown = keydown;
+    document.onkeyup = keyup;
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // renderScene();
@@ -618,19 +619,39 @@ function checkCollision(targetPosition) {
 const DBL_PRESS_THRESHOLD = 1000;
 let lastKeypressTime = 0;
 
-function keydown(ev) {
-    // KEYBOARD CONTROLS
-    // WASD for camera movement
-    // QE for horizontal camera rotation
-    // Arrow keys for vertical and horizontal camera rotation
-    // P for camera reset
+// Key state tracking for simultaneous inputs
+let keysPressed = {};
 
-    let targetEye = new Vector3(g_camera.eye.elements);
-    let targetAt = new Vector3(g_camera.at.elements);
+function keydown(ev) {
+    keysPressed[ev.keyCode] = true;
+
+    // Handle jump separately for double-jump detection
+    if (ev.keyCode == 32) { // Space - Jump
+        var thisKeypressTime = new Date();
+        if (thisKeypressTime - lastKeypressTime <= DBL_PRESS_THRESHOLD) {
+            g_camera.doubleJump();
+            thisKeypressTime = 0;
+        }
+        lastKeypressTime = thisKeypressTime;
+        g_camera.jump();
+    }
+
+    // Handle camera reset immediately
+    if (ev.keyCode == 80) { // P
+        g_camera.reset();
+    }
+}
+
+function keyup(ev) {
+    keysPressed[ev.keyCode] = false;
+}
+
+function processInput() {
     let speed = 0.2;
 
-    // CAMERA MOVEMENT - Predict next position
-    if (ev.keyCode == 87) { // W - Forward
+    // CAMERA MOVEMENT - Process all movement keys
+    if (keysPressed[87]) { // W - Forward
+        let targetEye = new Vector3(g_camera.eye.elements);
         let f = new Vector3();
         f.set(g_camera.at);
         f.sub(g_camera.eye);
@@ -640,7 +661,10 @@ function keydown(ev) {
         if (!checkCollision(targetEye)) {
             g_camera.moveForward(speed);
         }
-    } else if (ev.keyCode == 83) { // S - Backward
+    }
+
+    if (keysPressed[83]) { // S - Backward
+        let targetEye = new Vector3(g_camera.eye.elements);
         let b = new Vector3();
         b.set(g_camera.eye);
         b.sub(g_camera.at);
@@ -650,7 +674,10 @@ function keydown(ev) {
         if (!checkCollision(targetEye)) {
             g_camera.moveBackwards(speed);
         }
-    } else if (ev.keyCode == 65) { // A - Left
+    }
+
+    if (keysPressed[65]) { // A - Left
+        let targetEye = new Vector3(g_camera.eye.elements);
         let f = new Vector3();
         f.set(g_camera.at);
         f.sub(g_camera.eye);
@@ -662,7 +689,10 @@ function keydown(ev) {
         if (!checkCollision(targetEye)) {
             g_camera.moveLeft(speed);
         }
-    } else if (ev.keyCode == 68) { // D - Right
+    }
+
+    if (keysPressed[68]) { // D - Right
+        let targetEye = new Vector3(g_camera.eye.elements);
         let f = new Vector3();
         f.set(g_camera.at);
         f.sub(g_camera.eye);
@@ -674,39 +704,27 @@ function keydown(ev) {
         if (!checkCollision(targetEye)) {
             g_camera.moveRight(speed);
         }
-    } else if (ev.keyCode == 32) { // Space - Jump
-        var thisKeypressTime = new Date();
-        if (thisKeypressTime - lastKeypressTime <= DBL_PRESS_THRESHOLD) {
-            g_camera.doubleJump();
-            thisKeypressTime = 0;
-        }
-        lastKeypressTime = thisKeypressTime;
-        g_camera.jump();
     }
 
     // CAMERA ROTATION
-    else if (ev.keyCode == 81 || ev.keyCode == 37) { // Q or left arrow
+    if (keysPressed[81] || keysPressed[37]) { // Q or left arrow
         g_camera.panLeft(4);
-    } else if (ev.keyCode == 69 || ev.keyCode == 39) { // E or right arrow
+    }
+    if (keysPressed[69] || keysPressed[39]) { // E or right arrow
         g_camera.panRight(4);
-    } else if (ev.keyCode == 38) { // Up arrow
+    }
+    if (keysPressed[38]) { // Up arrow
         g_camera.tiltUp(4);
-    } else if (ev.keyCode == 40) { // Down arrow
+    }
+    if (keysPressed[40]) { // Down arrow
         g_camera.tiltDown(4);
     }
-
-
-    // CAMERA RESET
-    else if (ev.keyCode == 80) { // P
-        g_camera.reset();
-    }
-    renderScene();
-
 }
 
 function tick() {
     g_seconds = performance.now() / 1000.0 - g_startTime;
     updateAnimationAngles();
+    processInput(); // Process all held keys
     g_camera.update(g_map); // Update camera physics (gravity, jump)
     stats.begin();
     renderScene();
