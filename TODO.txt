@@ -1,6 +1,8 @@
 Parkour zone
 Add 3D obj (ghost) and gets closer
 Load already created maps
+Object creation / destruction
+-Array of blocks to select
 
 
 LAST STEP

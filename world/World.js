@@ -98,6 +98,8 @@ let g_animationSecondFlipper = false;
 let g_animationMiddleFlipper = false;
 let g_animationMovement = false;
 
+let g_block_index = 0;
+
 let g_camera;
 let stats;
 
@@ -234,7 +236,23 @@ function click(event) {
         var x = Math.floor(g_camera.eye.elements[0]);
         var y = Math.floor(g_camera.eye.elements[1]);
         var z = Math.floor(g_camera.eye.elements[2]);
-        g_map[x + 15][z + 15] = 1.2;
+
+        var decimal_2;
+        if (g_block_index == 0) {
+            decimal_2 = .7;
+        } else if (g_block_index == 1) {
+            decimal_2 = .5;
+        } else if (g_block_index == 2) {
+            decimal_2 = .0;
+        } else if (g_block_index == 3) {
+            decimal_2 = .2;
+        } else if (g_block_index == 4) {
+            decimal_2 = .8;
+        }
+
+        console.log(decimal_2);
+
+        g_map[x + 15][z + 15] = 1 + decimal_2;
         console.log("Block built at (x:", x, ", y:", z, ")");
     } else {
         var rect = canvas.getBoundingClientRect();
@@ -392,7 +410,11 @@ function addActionsForHTMLUI() {
 
     document.getElementById('enterButton3').addEventListener('click', function () {
         document.getElementById('instructions2').style.display = 'none';
+        document.getElementById('keyboardIndicator').style.display = 'block';
+        updateBlockSelection(); // Initialize first block as selected
     });
+
+    initKeyboardIndicator();
 
 
     document.getElementById("angleSlide").addEventListener("mousemove", function () { g_globalAngle = this.value; renderScene(); });
@@ -419,7 +441,37 @@ function addActionsForHTMLUI() {
     //         g_animationMovement = false;
     //         g_headAngle = 0;
     //     }
-    // });
+    // })
+}
+
+function initKeyboardIndicator() {
+    // This function sets up the keyboard indicator to respond to key presses
+    // The actual key highlighting is handled in keydown/keyup functions
+}
+
+function updateKeyVisual(keyCode, isPressed) {
+    const keyElement = document.querySelector(`.key[data-key="${keyCode}"]`);
+
+    if (keyElement) {
+        if (isPressed) {
+            keyElement.classList.add('pressed');
+        } else {
+            keyElement.classList.remove('pressed');
+        }
+    }
+}
+
+function updateBlockSelection() {
+    // Remove 'selected' class from all blocks
+    document.querySelectorAll('.block-type').forEach(block => {
+        block.classList.remove('selected');
+    });
+
+    // Add 'selected' class to the current block
+    const selectedBlock = document.querySelector(`.block-type[data-type="${g_block_index}"]`);
+    if (selectedBlock) {
+        selectedBlock.classList.add('selected');
+    }
 }
 
 function initTextures() {
@@ -694,6 +746,7 @@ let keysPressed = {};
 
 function keydown(ev) {
     keysPressed[ev.keyCode] = true;
+    updateKeyVisual(ev.keyCode, true);
 
     // Handle jump separately for double-jump detection
     if (ev.keyCode == 32) { // Space - Jump
@@ -714,11 +767,21 @@ function keydown(ev) {
         document.getElementById('loader').style.display = 'none';
         document.getElementById('main-container').style.display = 'flex';
         document.getElementById('bckMusic').play();
+    } else if (ev.keyCode == 9) { // Tab
+        ev.preventDefault();
+        if (ev.shiftKey) {
+            g_block_index = (g_block_index - 1 + 5) % 5;
+        } else {
+            g_block_index = (g_block_index + 1) % 5;
+        }
+        updateBlockSelection();
+        console.log("Selected block index: " + g_block_index);
     }
 }
 
 function keyup(ev) {
     keysPressed[ev.keyCode] = false;
+    updateKeyVisual(ev.keyCode, false);
 }
 
 function processInput() {
