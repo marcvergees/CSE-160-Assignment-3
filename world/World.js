@@ -243,11 +243,11 @@ function click(event) {
         } else if (g_block_index == 1) {
             decimal_2 = .5;
         } else if (g_block_index == 2) {
-            decimal_2 = .0;
-        } else if (g_block_index == 3) {
             decimal_2 = .2;
+        } else if (g_block_index == 3) {
+            decimal_2 = .0;
         } else if (g_block_index == 4) {
-            decimal_2 = .8;
+            decimal_2 = .4;
         }
 
         console.log(decimal_2);
@@ -415,7 +415,6 @@ function addActionsForHTMLUI() {
     });
 
     initKeyboardIndicator();
-
 
     document.getElementById("angleSlide").addEventListener("mousemove", function () { g_globalAngle = this.value; renderScene(); });
     // document.getElementById("firstFlipperAngle").addEventListener("mousemove", function () { g_firstFlipperAngle = this.value; renderScene(); });
