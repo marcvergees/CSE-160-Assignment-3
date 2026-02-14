@@ -232,28 +232,60 @@ function createStats() {
 }
 
 function click(event) {
-    if (event.shiftKey) { // We build a new block
-        var x = Math.floor(g_camera.eye.elements[0]);
-        var y = Math.floor(g_camera.eye.elements[1]);
-        var z = Math.floor(g_camera.eye.elements[2]);
+    canvas.oncontextmenu = function (e) { e.preventDefault(); };
+    if (event.button === 2) { // Right click - build or destroy block
+        // Calculate direction from eye to at
+        let eyeX = g_camera.eye.elements[0];
+        let eyeY = g_camera.eye.elements[1];
+        let eyeZ = g_camera.eye.elements[2];
+        let atX = g_camera.at.elements[0];
+        let atY = g_camera.at.elements[1];
+        let atZ = g_camera.at.elements[2];
 
-        var decimal_2;
-        if (g_block_index == 0) {
-            decimal_2 = .7;
-        } else if (g_block_index == 1) {
-            decimal_2 = .5;
-        } else if (g_block_index == 2) {
-            decimal_2 = .2;
-        } else if (g_block_index == 3) {
-            decimal_2 = .0;
-        } else if (g_block_index == 4) {
-            decimal_2 = .4;
+        // Direction vector (normalized)
+        let dx = atX - eyeX;
+        let dy = atY - eyeY;
+        let dz = atZ - eyeZ;
+        let len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        dx /= len;
+        dy /= len;
+        dz /= len;
+
+        // Step forward approx 3 units in the look direction to find target block
+        let targetX = eyeX + dx * 3;
+        let targetZ = eyeZ + dz * 3;
+
+        let mapX = Math.floor(targetX) + 16;
+        let mapZ = Math.floor(targetZ) + 16;
+
+        // Bounds check
+        if (mapX < 0 || mapX >= 32 || mapZ < 0 || mapZ >= 32) {
+            console.log("Out of bounds!");
+            return;
         }
 
-        console.log(decimal_2);
+        if (event.shiftKey) {
+            // Destroy block
+            g_map[mapX][mapZ] = 0;
+            console.log("Block destroyed at map[" + mapX + "][" + mapZ + "]");
+        } else {
+            // Build block
+            var decimal_2;
+            if (g_block_index == 0) {
+                decimal_2 = .7;
+            } else if (g_block_index == 1) {
+                decimal_2 = .5;
+            } else if (g_block_index == 2) {
+                decimal_2 = .2;
+            } else if (g_block_index == 3) {
+                decimal_2 = .0;
+            } else if (g_block_index == 4) {
+                decimal_2 = .4;
+            }
 
-        g_map[x + 15][z + 15] = 1 + decimal_2;
-        console.log("Block built at (x:", x, ", y:", z, ")");
+            g_map[mapX][mapZ] = 1 + decimal_2;
+            console.log("Block built at map[" + mapX + "][" + mapZ + "] with type " + g_block_index);
+        }
     } else {
         var rect = canvas.getBoundingClientRect();
         var x = event.clientX - rect.left;
