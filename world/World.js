@@ -26,6 +26,7 @@ var FSHADER_SOURCE = `
     uniform sampler2D u_Sampler6;
     uniform sampler2D u_Sampler7;
     uniform sampler2D u_Sampler8;
+    uniform sampler2D u_Sampler9;
     uniform int u_whichTexture;
     void main() {
         if (u_whichTexture == -2) {
@@ -50,6 +51,8 @@ var FSHADER_SOURCE = `
             gl_FragColor = texture2D(u_Sampler7, v_UV);     // Texture 7
         } else if (u_whichTexture == 8) {
             gl_FragColor = texture2D(u_Sampler8, v_UV);     // Texture 8
+        } else if (u_whichTexture == 9) {
+            gl_FragColor = texture2D(u_Sampler9, v_UV);     // Texture 9
         } else {
             gl_FragColor = vec4(1, .2, .2, 1);              // Default color
         }
@@ -75,10 +78,13 @@ let u_Sampler5;
 let u_Sampler6;
 let u_Sampler7;
 let u_Sampler8;
+let u_Sampler9;
 let u_whichTexture;
 
 let g_showAxis = true;
 let g_globalAngle = 0;
+
+let g_lightOn = true;
 
 let g_firstFlipperAngle = 0;
 let g_secondFlipperAngle = 0;
@@ -327,6 +333,11 @@ function connectVariablesToGLSL() {
         console.log('Failed to get the storage location of u_Sampler8');
         return;
     }
+    u_Sampler9 = gl.getUniformLocation(gl.program, 'u_Sampler9');
+    if (u_Sampler9 < 0) {
+        console.log('Failed to get the storage location of u_Sampler9');
+        return;
+    }
     u_whichTexture = gl.getUniformLocation(gl.program, 'u_whichTexture');
     if (!u_whichTexture) {
         console.log('Failed to get the storage location of u_whichTexture');
@@ -374,6 +385,15 @@ function addActionsForHTMLUI() {
         }, 6000);
     });
 
+    document.getElementById('enterButton2').addEventListener('click', function () {
+        document.getElementById('instructions').style.display = 'none';
+        document.getElementById('instructions2').style.display = 'block';
+    });
+
+    document.getElementById('enterButton3').addEventListener('click', function () {
+        document.getElementById('instructions2').style.display = 'none';
+    });
+
 
     document.getElementById("angleSlide").addEventListener("mousemove", function () { g_globalAngle = this.value; renderScene(); });
     // document.getElementById("firstFlipperAngle").addEventListener("mousemove", function () { g_firstFlipperAngle = this.value; renderScene(); });
@@ -381,6 +401,8 @@ function addActionsForHTMLUI() {
     // document.getElementById("middleFlipperAngle").addEventListener("mousemove", function () { g_middleFlipperAngle = this.value; renderScene(); });
     document.getElementById("my-toggle-music").addEventListener("change", function () { document.getElementById("bckMusic").muted = this.checked; });
     document.getElementById("volumeSlide").addEventListener("mousemove", function () { document.getElementById("bckMusic").volume = this.value / 100; });
+    document.getElementById("my-toggle-light").addEventListener("change", function () { g_lightOn = !this.checked; this.blur(); });
+    document.getElementById("showInstructions").addEventListener("click", function () { document.getElementById("instructions").style.display = "block"; });
     // document.getElementById("my-toggle-middleFlipper").addEventListener("change", function () { g_animationMiddleFlipper = this.checked; });
     // document.getElementById("my-toggle-firstFlipper").addEventListener("change", function () { g_animationFirstFlipper = this.checked; });
     // document.getElementById("my-toggle-secondFlipper").addEventListener("change", function () { g_animationSecondFlipper = this.checked; });
@@ -472,6 +494,14 @@ function initTextures() {
     }
     image8.onload = function () { sendImageToTEXTURE8(image8); };
     image8.src = '../img/terrain.webp';
+
+    var image9 = new Image();
+    if (!image9) {
+        console.log('Failed to load the image');
+        return false;
+    }
+    image9.onload = function () { sendImageToTEXTURE9(image9); };
+    image9.src = '../img/dark.png';
 
     return true;
 }
@@ -601,6 +631,20 @@ function sendImageToTEXTURE8(image) {
     gl.uniform1i(u_Sampler8, 8);
 }
 
+function sendImageToTEXTURE9(image) {
+    var texture = gl.createTexture();
+    if (!texture) {
+        console.log('Failed to create the texture object');
+        return false;
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.activeTexture(gl.TEXTURE9);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(u_Sampler9, 9);
+}
+
 function initCamera() {
     g_camera = new Camera();
     g_camera.eye = new Vector3([0, 0, 0]);
@@ -665,6 +709,11 @@ function keydown(ev) {
     // Handle camera reset immediately
     if (ev.keyCode == 80) { // P
         g_camera.reset();
+    } else if (ev.keyCode == 27) { // Escape
+        // Skip the initial animation.
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('main-container').style.display = 'flex';
+        document.getElementById('bckMusic').play();
     }
 }
 
@@ -1025,7 +1074,7 @@ function renderScene() {
     floor.render();
 
     var sky = new Cube();
-    sky.textureNum = 1;
+    sky.textureNum = g_lightOn ? 1 : 9;
     sky.matrix.scale(50, 50, 50);
     sky.matrix.translate(-.5, -.5, -.5);
     sky.render();
@@ -1053,7 +1102,7 @@ function sendMapCoordinatesToHTML() {
     x_prime = Math.floor(x);
     y_prime = Math.floor(y);
     z_prime = Math.floor(z);
-    sendTextToHTML("x: " + x_prime + " y: " + y_prime + " z: " + z_prime + "(" + x + "," + y + "," + z + ")", "eyeCoordinates");
+    sendTextToHTML("x: " + x_prime + " y: " + y_prime + " z: " + z_prime + " (" + x.toFixed(2) + ", " + y.toFixed(2) + ", " + z.toFixed(2) + ")", "eyeCoordinates");
 
     at1 = g_camera.at.elements[0];
     at2 = g_camera.at.elements[1];
@@ -1070,10 +1119,5 @@ function sendMapCoordinatesToHTML() {
     up2_prime = Math.floor(up2);
     up3_prime = Math.floor(up3);
     sendTextToHTML("up: " + up1_prime + " up: " + up2_prime + " up: " + up3_prime, "upCoordinates");
-
-    if (0 <= 15 + x_prime && 15 + x_prime < 32 && 0 <= 15 + z_prime && 15 + z_prime < 32) {
-        sendTextToHTML("Map: (15,15): " + g_map[15 + x_prime][15 + z_prime], "mapCoordinates1");
-        // sendTextToHTML("Map: (16,16): " + g_map[16 + x_prime][16 + z_prime], "mapCoordinates2");
-    }
 }
 

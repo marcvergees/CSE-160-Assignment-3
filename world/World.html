@@ -254,16 +254,8 @@ Nothing.
             display: inline-block;
             box-shadow: 0 0 4px currentColor;
         }
-    </style>
-</head>
 
-<body onload="main()">
-
-    <div id="loader"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;">
-        <h1 id="titleInfo1">Ancient Whispers...</h1>
-        <h1 id="titleInfo2">Are Calling</h1>
-        <button id="enterButton" style="
+        .medieval-button {
             margin-top: 30px;
             padding: 15px 30px;
             font-family: 'MedievalSharp', cursive;
@@ -274,13 +266,82 @@ Nothing.
             cursor: pointer;
             box-shadow: 0 0 15px var(--shadow);
             transition: all 0.3s;
-        ">BEGIN JOURNEY</button>
+            text-transform: uppercase;
+        }
+
+        .medieval-button:hover {
+            box-shadow: 0 0 15px var(--gold-highlight);
+            transform: scale(1.05);
+        }
+
+        .medieval-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body onload="main()">
+
+    <div id="loader"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;">
+        <p style="font-size: 1.2rem; font-family: 'MedievalSharp', cursive;"><kbd>ESC</kbd>: Skip Intro</p>
+        <h1 id="titleInfo1">Ancient Whispers...</h1>
+        <h1 id="titleInfo2">Are Calling</h1>
+        <button id="enterButton" class="medieval-button">BEGIN JOURNEY</button>
     </div>
     <audio id="bckMusic" style="display: none;" loop>
         <source src="../music/Aria_Math.ogg" type="audio/ogg">
     </audio>
 
+
     <div id="main-container" class="main-container" style="display: none; flex-direction: column; align-items: center;">
+        <div id="instructions"
+            style="display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 80%; background: var(--bg-color); z-index: 1000; border: 2px solid var(--gold); padding: 20px; overflow-y: auto;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <h1>Instructions</h1>
+                <div style="font-family: 'Cinzel', serif; line-height: 1.6;">
+                    <p>Welcome, Traveler, to the heart of the realm. Master these arts to navigate the fortress:</p>
+                    <ul style="list-style-type: none; padding: 0;">
+                        <li><strong style="color: var(--gold);">W, A, S, D:</strong> Traverse the grounds (Forward,
+                            Left,
+                            Back, Right)</li>
+                        <li><strong style="color: var(--gold);">Q, E or Arrows:</strong> Gaze upon your surroundings
+                        </li>
+                        <li><strong style="color: var(--gold);">Space:</strong> Leap into the air</li>
+                        <li><strong style="color: var(--gold);">Double Space:</strong> A grander leap (Double Jump)</li>
+                        <li><strong style="color: var(--gold);">Mouse Drag:</strong> Command your vision</li>
+                        <li><strong style="color: var(--gold);">P:</strong> Return to the beginning (Reset Camera)</li>
+                        <li><strong style="color: var(--gold);">ESC:</strong> Hasten your arrival (Skip Intro)</li>
+                    </ul>
+                    <p style="font-style: italic; margin-top: 15px; color: var(--gold-highlight);">May your journey be
+                        legendary.</p>
+                </div>
+
+                <button id="enterButton2" class="medieval-button">NEXT</button>
+            </div>
+        </div>
+        <div id="instructions2"
+            style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 80%; background: var(--bg-color); z-index: 1000; border: 2px solid var(--gold); padding: 20px; overflow-y: auto;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <h1>The Peril</h1>
+                <div style="font-family: 'Cinzel', serif; line-height: 1.6; text-align: center;">
+                    <p>Within these stone walls, you are not alone. A <span
+                            style="color: var(--gold-highlight);">vengeful
+                            ghost</span> stalks the corridors, seeking to claim your soul. If the specter draws near,
+                        your
+                        life will be extinguished in an instant.</p>
+                    <p>You must navigate the dark corners of the castle and uncover its secrets, all while staying one
+                        step
+                        ahead of your spectral hunter.</p>
+                    <p style="color: #ff4d4d; font-weight: bold;">Tread carefully: the fortress borders the abyss. If
+                        you fail to stay within the walls and fall from the world, you will perish immediately.</p>
+                    <p style="font-style: italic; margin-top: 15px; color: var(--gold);">Survive the hunt. Escape the
+                        fortress.</p>
+                </div>
+
+                <button id="enterButton3" class="medieval-button">PLAY NOW</button>
+            </div>
+        </div>
         <h1>My Castle</h1>
         <div style="display: flex; flex-direction: row; gap: 40px;">
             <div id="canvas-container">
@@ -295,22 +356,13 @@ Nothing.
                     <div class="axis-item"><span class="dot" style="background:green;"></span> Y Axis</div>
                     <div class="axis-item"><span class="dot" style="background:blue;"></span> Z Axis</div>
                 </div>
-                <div class="axis-legend" id="mapCoordinates1">
-                </div>
-                <div class="axis-legend" id="mapCoordinates2">
-                </div>
-                <div class="axis-legend" id="eyeCoordinates">
-                </div>
-                <div class="axis-legend" id="atCoordinates">
-                </div>
-                <div class="axis-legend" id="upCoordinates">
-                </div>
+
             </div>
 
             <div class="controls-panel">
                 <div
                     style="text-align: center; color: var(--parchment); font-size: 0.9rem; margin-bottom: 10px; font-style: italic;">
-                    -- Architecture Controls --
+                    -- Adjust Controls --
                 </div>
 
                 <div class="control-group">
@@ -322,6 +374,7 @@ Nothing.
                     <label for="volumeSlide">Volume (Music)</label>
                     <input type="range" min="0" max="100" value="50" class="slider" id="volumeSlide" />
                 </div>
+
 
                 <!-- <div class="control-group">
                     <label for="firstFlipperAngle">Gate Mechanism I</label>
@@ -357,6 +410,21 @@ Nothing.
                     <label for="my-toggle-music" style="cursor:pointer; flex-grow: 1;">Mute Music</label>
                     <input type="checkbox" id="my-toggle-music">
                 </div>
+                <div class="toggle-container">
+                    <label for="my-toggle-light" style="cursor:pointer; flex-grow: 1;">Dark Mode</label>
+                    <input type="checkbox" id="my-toggle-light">
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0px;">
+                    <div class="axis-legend" id="eyeCoordinates">
+                    </div>
+                    <div class="axis-legend" id="atCoordinates">
+                    </div>
+                    <div class="axis-legend" id="upCoordinates">
+                    </div>
+                </div>
+
+                <button id="showInstructions" class="medieval-button">Instructions</button>
 
             </div>
 

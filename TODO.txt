@@ -1,8 +1,6 @@
-Light/Dark Mode -> change sky and floor
-Add Instructions of camera and character movement
-Add medieval music
 Parkour zone
 Add 3D obj (ghost) and gets closer
+Load already created maps
 
 
 LAST STEP
