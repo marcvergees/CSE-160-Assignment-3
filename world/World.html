@@ -502,6 +502,18 @@ Nothing.
                 </div>
 
                 <div class="control-group">
+                    <label for="mapSelect">Realm Selection</label>
+                    <select id="mapSelect"
+                        style="width: 100%; background: rgba(0,0,0,0.5); color: var(--gold); border: 1px solid var(--gold); padding: 8px; border-radius: 4px; font-family: 'Cinzel', serif; cursor: pointer; font-size: 0.9rem;">
+                        <option value="default">Ancient Fortress</option>
+                        <option value="empty">Empty Expanse</option>
+                        <option value="arena">Combat Arena</option>
+                        <option value="labyrinth">The Labyrinth</option>
+                    </select>
+                </div>
+
+
+                <div class="control-group">
                     <label for="angleSlide">Perspective (Camera)</label>
                     <input type="range" min="0" max="360" value="190" class="slider" id="angleSlide" />
                 </div>
@@ -572,6 +584,7 @@ Nothing.
     <script src="../lib/cuon-utils.js"></script>
     <script src="../lib/cuon-matrix-cse160.js"></script>
     <script src="../lib/stats.js"></script>
+    <script src="../world/Maps.js"></script>
     <script src="../world/World.js"></script>
     <script src="../world/Camera.js"></script>
     <script src="../blockyAnimal2/Point.js"></script>

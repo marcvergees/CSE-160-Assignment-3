@@ -1,6 +1,5 @@
 Parkour zone
 Add 3D obj (ghost) and gets closer
-Load already created maps
 
 
 LAST STEP
